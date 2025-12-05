@@ -242,8 +242,6 @@ deobfuscator/
 │   └── manifest.json              # Extension manifest (v2)
 ├── build.sh                       # Build script
 ├── deobfuscator.xpi               # Packaged extension
-├── URL_SHORTENER_PLAN.md          # Detailed implementation plan with embedded Tor
-├── URL_SHORTENER_EMBEDDED_TOR_PLAN.md  # Technical details for Tor integration
 └── README.md                      # This file
 ```
 
@@ -362,13 +360,6 @@ Contributions are welcome!
 2. Add domain to `SHORTENER_DOMAINS` array
 3. Test detection and resolution
 4. Submit a pull request
-
-### Future Development
-
-See `URL_SHORTENER_PLAN.md` and `URL_SHORTENER_EMBEDDED_TOR_PLAN.md` for detailed plans on:
-- Embedded Tor integration via Arti (WebAssembly)
-- Advanced privacy features
-- Performance optimizations
 
 ---
 
