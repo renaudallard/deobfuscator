@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "Deobfuscator",
+  "description": "Restores original URLs from Microsoft Safe Links and similar wrappers in displayed messages, including nested/base64 encoded content and attached .eml files.",
+  "version": "0.0.1",
+  "developer": {
+    "name": "Renaud Allard"
+  },
+  "applications": {
+    "gecko": {
+      "id": "deobfuscator@arnor.org",
+      "strict_min_version": "102.0"
+    }
+  },
+  "permissions": [
+    "messagesRead",
+    "menus",
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  }
+}

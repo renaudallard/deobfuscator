@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Deobfuscate Link</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+    }
+
+    body {
+      width: 600px;
+      padding: 24px;
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: Canvas;
+      color: CanvasText;
+    }
+
+    h2 {
+      margin: 0 0 16px 0;
+      font-size: 18px;
+      color: #d9534f;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      h2 {
+        color: #ff6b6b;
+      }
+    }
+
+    .section {
+      margin-bottom: 16px;
+    }
+    .section:last-of-type {
+      margin-bottom: 24px;
+    }
+
+    strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .url-box {
+      background: rgba(0, 0, 0, 0.05);
+      padding: 8px;
+      border-radius: 4px;
+      word-break: break-all;
+      font-size: 12px;
+      max-height: 100px;
+      overflow-y: auto;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .url-box {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    .clean .url-box {
+      background: rgba(92, 184, 92, 0.1);
+      border: 1px solid rgba(92, 184, 92, 0.2);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .clean .url-box {
+        background: rgba(92, 184, 92, 0.15);
+        border: 1px solid rgba(92, 184, 92, 0.3);
+      }
+    }
+
+    .clean strong {
+      color: #5cb85c;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .clean strong {
+        color: #6ed46e;
+      }
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+    }
+
+    .buttons-right {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      color: white;
+    }
+
+    #cancel {
+      background: #6c757d;
+    }
+
+    #cancel:hover {
+      background: #5a6268;
+    }
+
+    #open-original {
+      background: #d9534f;
+    }
+
+    #open-original:hover {
+      background: #c9302c;
+    }
+
+    #open-clean {
+      background: #5cb85c;
+      font-weight: bold;
+    }
+
+    #open-clean:hover {
+      background: #449d44;
+    }
+
+    button:hover {
+      opacity: 0.95;
+    }
+
+    button:active {
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔗 Deobfuscate Link?</h2>
+
+  <div class="section">
+    <strong>Original link:</strong>
+    <div class="url-box" id="original-url"></div>
+  </div>
+
+  <div class="section clean">
+    <strong>Clean URL:</strong>
+    <div class="url-box" id="clean-url"></div>
+  </div>
+
+  <div class="buttons">
+    <button id="cancel">Cancel</button>
+    <div class="buttons-right">
+      <button id="open-original">Open Original Link</button>
+      <button id="open-clean">Open Clean Link</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
