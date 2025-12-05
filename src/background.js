@@ -101,6 +101,47 @@ const log = (msg, extra) => {
     return null;
   };
 
+  // URL Shortener domains
+  const SHORTENER_DOMAINS = [
+    // Popular services
+    'bit.ly', 'bitly.com', 'tinyurl.com', 't.co', 'goo.gl',
+    'ow.ly', 'is.gd', 'buff.ly', 'tiny.cc', 'short.link',
+    // Social media shorteners
+    'fb.me', 'lnkd.in', 'youtu.be', 'amzn.to', 'ebay.us',
+    // Other common shorteners
+    'adf.ly', 'bc.vc', 'budurl.com', 'clck.ru', 'db.tt',
+    'filoops.info', 'linkbun.ch', 'ity.im', 'q.gs', 'qr.ae',
+    'qr.net', 'rebrand.ly', 'smarturl.it', 'su.pr', 'trib.al',
+    'u.to', 'v.gd', 'x.co', 'zip.net', 'zpr.io'
+  ];
+
+  // Check if URL is a shortener
+  const isShortener = (url) => {
+    try {
+      const hostname = new URL(url).hostname.toLowerCase();
+      return SHORTENER_DOMAINS.some(domain =>
+        hostname === domain || hostname.endsWith('.' + domain)
+      );
+    } catch (err) {
+      return false;
+    }
+  };
+
+  // Get shortener service name
+  const getShortenerService = (url) => {
+    try {
+      const hostname = new URL(url).hostname.toLowerCase();
+      for (const domain of SHORTENER_DOMAINS) {
+        if (hostname === domain || hostname.endsWith('.' + domain)) {
+          return domain;
+        }
+      }
+      return 'Unknown Shortener';
+    } catch (err) {
+      return 'Unknown Shortener';
+    }
+  };
+
   // Helper function to deobfuscate URL
   const deobfuscateUrl = (url) => {
     try {
@@ -231,6 +272,14 @@ const log = (msg, extra) => {
         if (result) return result;
       }
 
+      // Check if it's a shortener (after checking protection services)
+      if (isShortener(url)) {
+        return {
+          type: 'shortener',
+          service: getShortenerService(url)
+        };
+      }
+
       return null;
     } catch (_err) {
       return null;
@@ -269,33 +318,59 @@ const log = (msg, extra) => {
         const linkUrl = info.linkUrl;
         log(`Context menu clicked on: ${linkUrl}`);
 
-        const clean = deobfuscateUrl(linkUrl);
-        if (clean) {
-          log(`Deobfuscated: ${clean}`);
-          log(`Service detected: ${identifyService(linkUrl)}`);
+        const result = deobfuscateUrl(linkUrl);
+        if (result) {
+          if (typeof result === 'string') {
+            // Old behavior: clean URL returned directly (protection service)
+            log(`Deobfuscated: ${result}`);
+            log(`Service detected: ${identifyService(linkUrl)}`);
 
-          // Open popup window with URLs
-          const popupUrl = runtime.runtime.getURL("popup.html") +
-            "?original=" + encodeURIComponent(linkUrl) +
-            "&clean=" + encodeURIComponent(clean);
+            // Open popup window with URLs
+            const popupUrl = runtime.runtime.getURL("popup.html") +
+              "?type=protection" +
+              "&original=" + encodeURIComponent(linkUrl) +
+              "&clean=" + encodeURIComponent(result) +
+              "&service=" + encodeURIComponent(identifyService(linkUrl));
 
-          try {
-            await runtime.windows.create({
-              url: popupUrl,
-              type: "popup",
-              width: 650,
-              height: 350
-            });
-            log("✓ Popup window opened");
-          } catch (error) {
-            log(`✗ Failed to open popup: ${error.message}, opening directly`);
-            if (runtime.windows && runtime.windows.openDefaultBrowser) {
-              runtime.windows.openDefaultBrowser(clean);
-              log(`✓ Opened clean URL in browser`);
+            try {
+              await runtime.windows.create({
+                url: popupUrl,
+                type: "popup",
+                width: 650,
+                height: 400
+              });
+              log("✓ Popup window opened");
+            } catch (error) {
+              log(`✗ Failed to open popup: ${error.message}, opening directly`);
+              if (runtime.windows && runtime.windows.openDefaultBrowser) {
+                runtime.windows.openDefaultBrowser(result);
+                log(`✓ Opened clean URL in browser`);
+              }
+            }
+          } else if (result.type === 'shortener') {
+            // New behavior: shortener detected, needs resolution
+            log(`Shortener detected: ${result.service}`);
+
+            // Open popup window for shortener resolution
+            const popupUrl = runtime.runtime.getURL("popup.html") +
+              "?type=shortener" +
+              "&original=" + encodeURIComponent(linkUrl) +
+              "&service=" + encodeURIComponent(result.service);
+
+            try {
+              await runtime.windows.create({
+                url: popupUrl,
+                type: "popup",
+                width: 650,
+                height: 500
+              });
+              log("✓ Popup window opened for shortener");
+            } catch (error) {
+              log(`✗ Failed to open popup: ${error.message}`);
             }
           }
         } else {
-          log(`Not a Safe Link or couldn't deobfuscate`);
+          log(`Not a protected link or shortener`);
         }
       }
     });
@@ -399,8 +474,79 @@ const log = (msg, extra) => {
     'trellix'
   ];
 
+  // Direct resolution function
+  const resolveDirect = async (url, progressCallback) => {
+    try {
+      log(`Resolving shortener directly: ${url}`);
+      progressCallback?.({ status: 'Sending HEAD request...' });
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+
+      const response = await fetch(url, {
+        method: 'HEAD',
+        redirect: 'manual',
+        cache: 'no-store',
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Thunderbird Deobfuscator)'
+        }
+      });
+
+      clearTimeout(timeout);
+
+      const location = response.headers.get('Location');
+      if (location) {
+        const resolvedUrl = new URL(location, url).href;
+        log(`✓ Resolved to: ${resolvedUrl}`);
+        progressCallback?.({ status: 'Resolution complete!' });
+        return {
+          success: true,
+          url: resolvedUrl,
+          method: 'direct'
+        };
+      }
+
+      throw new Error('No redirect found - URL may not be a shortener');
+    } catch (err) {
+      log(`✗ Resolution failed: ${err.message}`);
+      if (err.name === 'AbortError') {
+        throw new Error('Request timed out after 30 seconds');
+      }
+      throw err;
+    }
+  };
+
   // Listen for messages from message display scripts
   runtime.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "resolveShortener") {
+      log(`Received request to resolve shortener: ${message.url}`);
+      const { url, method } = message;
+
+      (async () => {
+        try {
+          let result;
+          if (method === 'direct') {
+            result = await resolveDirect(url, (progress) => {
+              // Send progress updates to popup
+              runtime.runtime.sendMessage({
+                action: 'resolutionProgress',
+                ...progress
+              }).catch(() => {});
+            });
+          } else {
+            throw new Error('Unknown resolution method: ' + method);
+          }
+
+          sendResponse({ success: true, result });
+        } catch (err) {
+          sendResponse({ success: false, error: err.message });
+        }
+      })();
+
+      return true; // Keep channel open for async response
+    }
+
     if (message.action === "openUrl" && message.url) {
       log(`Received request to open URL: ${message.url}`);
       try {

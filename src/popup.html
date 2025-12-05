@@ -23,9 +23,23 @@
       color: #d9534f;
     }
 
+    h2.warning {
+      color: #f0ad4e;
+    }
+
+    h2.success {
+      color: #5cb85c;
+    }
+
     @media (prefers-color-scheme: dark) {
       h2 {
         color: #ff6b6b;
+      }
+      h2.warning {
+        color: #ffc107;
+      }
+      h2.success {
+        color: #6ed46e;
       }
     }
 
@@ -81,6 +95,129 @@
       }
     }
 
+    .service-info {
+      background: rgba(240, 173, 78, 0.1);
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(240, 173, 78, 0.3);
+      font-size: 14px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .service-info {
+        background: rgba(240, 173, 78, 0.15);
+        border: 1px solid rgba(240, 173, 78, 0.4);
+      }
+    }
+
+    .privacy-warning {
+      background: rgba(217, 83, 79, 0.1);
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(217, 83, 79, 0.3);
+      font-size: 13px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .privacy-warning {
+        background: rgba(217, 83, 79, 0.15);
+        border: 1px solid rgba(217, 83, 79, 0.4);
+      }
+    }
+
+    .privacy-warning strong {
+      display: inline;
+      color: #d9534f;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .privacy-warning strong {
+        color: #ff6b6b;
+      }
+    }
+
+    .privacy-warning ul {
+      margin: 8px 0 0 0;
+      padding-left: 20px;
+    }
+
+    .privacy-warning li {
+      margin: 4px 0;
+    }
+
+    .resolution-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .resolution-method {
+      border: 2px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .resolution-method {
+        border: 2px solid rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    .resolution-method:hover {
+      border-color: #5cb85c;
+      background: rgba(92, 184, 92, 0.05);
+    }
+
+    .resolution-method h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .resolution-method p {
+      margin: 4px 0;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .resolution-method .timing {
+      color: #6c757d;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .resolution-method button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+      background: #5cb85c;
+    }
+
+    .resolution-method button:hover {
+      background: #449d44;
+    }
+
+    .resolution-method.direct button {
+      background: #5bc0de;
+    }
+
+    .resolution-method.direct button:hover {
+      background: #31b0d5;
+    }
+
     .buttons {
       display: flex;
       gap: 12px;
@@ -101,6 +238,11 @@
       color: white;
     }
 
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     #cancel {
       background: #6c757d;
     }
@@ -117,6 +259,14 @@
       background: #c9302c;
     }
 
+    #open-anyway {
+      background: #f0ad4e;
+    }
+
+    #open-anyway:hover {
+      background: #ec971f;
+    }
+
     #open-clean {
       background: #5cb85c;
       font-weight: bold;
@@ -126,11 +276,11 @@
       background: #449d44;
     }
 
-    button:hover {
+    button:hover:not(:disabled) {
       opacity: 0.95;
     }
 
-    button:active {
+    button:active:not(:disabled) {
       opacity: 0.85;
     }
 
@@ -180,32 +330,204 @@
         border-color: #6ed46e;
       }
     }
+
+    .status-message {
+      background: rgba(91, 192, 222, 0.1);
+      border: 1px solid rgba(91, 192, 222, 0.3);
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      text-align: center;
+      font-style: italic;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .status-message {
+        background: rgba(91, 192, 222, 0.15);
+        border: 1px solid rgba(91, 192, 222, 0.4);
+      }
+    }
+
+    .error-message {
+      background: rgba(217, 83, 79, 0.1);
+      border: 1px solid rgba(217, 83, 79, 0.3);
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      color: #d9534f;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .error-message {
+        background: rgba(217, 83, 79, 0.15);
+        border: 1px solid rgba(217, 83, 79, 0.4);
+        color: #ff6b6b;
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <h2>🔗 Deobfuscate Link?</h2>
+  <!-- Protection Service View -->
+  <div id="protection-view" class="hidden">
+    <h2>🔗 Deobfuscate Link?</h2>
 
-  <div class="section">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-      <strong>Original link:</strong>
-      <button class="copy-btn" id="copy-original" title="Copy to clipboard">📋 Copy</button>
+    <div class="service-info">
+      Service detected: <strong id="protection-service"></strong>
     </div>
-    <div class="url-box" id="original-url"></div>
+
+    <div class="section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <strong>Original link:</strong>
+        <button class="copy-btn" id="copy-original-protection" title="Copy to clipboard">📋 Copy</button>
+      </div>
+      <div class="url-box" id="original-url-protection"></div>
+    </div>
+
+    <div class="section clean">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <strong>Clean URL:</strong>
+        <button class="copy-btn" id="copy-clean-protection" title="Copy to clipboard">📋 Copy</button>
+      </div>
+      <div class="url-box" id="clean-url-protection"></div>
+    </div>
+
+    <div class="buttons">
+      <button id="cancel-protection">Cancel</button>
+      <div class="buttons-right">
+        <button id="open-original-protection">Open Original Link</button>
+        <button id="open-clean-protection">Open Clean Link</button>
+      </div>
+    </div>
   </div>
 
-  <div class="section clean">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-      <strong>Clean URL:</strong>
-      <button class="copy-btn" id="copy-clean" title="Copy to clipboard">📋 Copy</button>
+  <!-- Shortener View (Before Resolution) -->
+  <div id="shortener-view" class="hidden">
+    <h2 class="warning">⚠️ URL Shortener Detected</h2>
+
+    <div class="service-info">
+      Service: <strong id="shortener-service"></strong> (URL shortener)
     </div>
-    <div class="url-box" id="clean-url"></div>
+
+    <div class="section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <strong>Shortened link:</strong>
+        <button class="copy-btn" id="copy-original-shortener" title="Copy to clipboard">📋 Copy</button>
+      </div>
+      <div class="url-box" id="original-url-shortener"></div>
+    </div>
+
+    <div class="privacy-warning">
+      <strong>⚠️ Destination Unknown</strong>
+      <p>This shortened URL hides the real destination. To reveal it, we need to make a network request.</p>
+    </div>
+
+    <div class="resolution-methods">
+      <div class="resolution-method direct">
+        <h3>🚀 Direct Resolution (Fast)</h3>
+        <p><strong>Exposes to shortener service:</strong></p>
+        <ul style="margin: 4px 0; padding-left: 20px; font-size: 13px;">
+          <li>Your IP address</li>
+          <li>Request timestamp</li>
+          <li>That you checked this specific link</li>
+        </ul>
+        <p class="timing">⏱️ Usually: &lt;1 second</p>
+        <button id="resolve-direct">Resolve Directly</button>
+      </div>
+
+      <div class="resolution-method tor" style="opacity: 0.5; cursor: not-allowed;">
+        <h3>🧅 Tor Resolution (Private)</h3>
+        <p><strong>Coming Soon:</strong> Anonymous resolution via embedded Tor</p>
+        <p>Hides your IP address from shortener service. No external Tor installation required.</p>
+        <p class="timing">⏱️ Usually: 3-10 seconds</p>
+        <button disabled>Coming in v0.2.0</button>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button id="cancel-shortener">Cancel</button>
+      <button id="open-anyway">Open Shortened Link Anyway</button>
+    </div>
   </div>
 
-  <div class="buttons">
-    <button id="cancel">Cancel</button>
-    <div class="buttons-right">
-      <button id="open-original">Open Original Link</button>
-      <button id="open-clean">Open Clean Link</button>
+  <!-- Shortener View (Resolving) -->
+  <div id="resolving-view" class="hidden">
+    <h2>🔍 Resolving Shortened URL...</h2>
+
+    <div class="section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <strong>Shortened link:</strong>
+        <button class="copy-btn" id="copy-original-resolving" title="Copy to clipboard">📋 Copy</button>
+      </div>
+      <div class="url-box" id="original-url-resolving"></div>
+    </div>
+
+    <div class="status-message" id="resolution-status">
+      Sending HEAD request...
+    </div>
+
+    <div class="buttons">
+      <button id="cancel-resolving">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Shortener View (Resolved) -->
+  <div id="resolved-view" class="hidden">
+    <h2 class="success">✅ Shortened URL Resolved</h2>
+
+    <div class="service-info">
+      Service: <strong id="resolved-service"></strong><br>
+      Resolution method: <strong id="resolution-method"></strong>
+    </div>
+
+    <div class="section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <strong>Shortened link:</strong>
+        <button class="copy-btn" id="copy-original-resolved" title="Copy to clipboard">📋 Copy</button>
+      </div>
+      <div class="url-box" id="original-url-resolved"></div>
+    </div>
+
+    <div class="section clean">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <strong>Final destination:</strong>
+        <button class="copy-btn" id="copy-clean-resolved" title="Copy to clipboard">📋 Copy</button>
+      </div>
+      <div class="url-box" id="clean-url-resolved"></div>
+    </div>
+
+    <div class="buttons">
+      <button id="cancel-resolved">Cancel</button>
+      <div class="buttons-right">
+        <button id="open-original-resolved">Open Shortened Link</button>
+        <button id="open-clean-resolved">Open Destination</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error View -->
+  <div id="error-view" class="hidden">
+    <h2>❌ Resolution Failed</h2>
+
+    <div class="section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <strong>Shortened link:</strong>
+        <button class="copy-btn" id="copy-original-error" title="Copy to clipboard">📋 Copy</button>
+      </div>
+      <div class="url-box" id="original-url-error"></div>
+    </div>
+
+    <div class="error-message" id="error-message"></div>
+
+    <div class="buttons">
+      <button id="cancel-error">Cancel</button>
+      <div class="buttons-right">
+        <button id="retry-error">Try Again</button>
+        <button id="open-anyway-error">Open Anyway</button>
+      </div>
     </div>
   </div>
 

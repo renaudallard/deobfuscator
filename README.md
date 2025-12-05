@@ -142,7 +142,6 @@ zip -r ../deobfuscator.xpi *
 deobfuscator/
 ├── src/
 │   ├── background.js       # Core deobfuscation logic, context menu & auto-detection
-│   ├── message-scanner.js  # Message content scanner (unused due to protocol restrictions)
 │   ├── popup.html          # Popup UI with theme support
 │   ├── popup.js            # Popup behavior & clipboard functionality
 │   └── manifest.json       # Extension manifest (v2)
