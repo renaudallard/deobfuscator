@@ -133,18 +133,71 @@
     button:active {
       opacity: 0.85;
     }
+
+    .copy-btn {
+      padding: 4px 12px;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.1);
+      color: CanvasText;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      background: rgba(0, 0, 0, 0.15);
+      opacity: 1;
+    }
+
+    .copy-btn:active {
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .copy-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .copy-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .copy-btn:active {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+
+    .copy-btn.copied {
+      background: #5cb85c;
+      color: white;
+      border-color: #5cb85c;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .copy-btn.copied {
+        background: #6ed46e;
+        border-color: #6ed46e;
+      }
+    }
   </style>
 </head>
 <body>
   <h2>🔗 Deobfuscate Link?</h2>
 
   <div class="section">
-    <strong>Original link:</strong>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+      <strong>Original link:</strong>
+      <button class="copy-btn" id="copy-original" title="Copy to clipboard">📋 Copy</button>
+    </div>
     <div class="url-box" id="original-url"></div>
   </div>
 
   <div class="section clean">
-    <strong>Clean URL:</strong>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+      <strong>Clean URL:</strong>
+      <button class="copy-btn" id="copy-clean" title="Copy to clipboard">📋 Copy</button>
+    </div>
     <div class="url-box" id="clean-url"></div>
   </div>
 

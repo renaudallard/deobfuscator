@@ -13,7 +13,6 @@
     }
   },
   "permissions": [
-    "messagesRead",
     "menus",
     "<all_urls>"
   ],

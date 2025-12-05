@@ -40,7 +40,7 @@ const log = (msg, extra) => {
         title: "Deobfuscate Link",
         contexts: ["link"]
       });
-      log("✓ Context menu created");
+      log("✓ Context menu created - right-click any Safe Link and select 'Deobfuscate Link'");
     } catch (error) {
       log(`✗ Failed to create context menu: ${error.message}`);
     }
@@ -124,6 +124,28 @@ const log = (msg, extra) => {
       }
       return true; // Keep the message channel open for sendResponse
     }
+
+    if (message.action === "showPopup") {
+      log(`Received request to show popup for link`);
+      const popupUrl = runtime.runtime.getURL("popup.html") +
+        "?original=" + encodeURIComponent(message.original) +
+        "&clean=" + encodeURIComponent(message.clean);
+
+      runtime.windows.create({
+        url: popupUrl,
+        type: "popup",
+        width: 650,
+        height: 350
+      }).then(() => {
+        log("✓ Popup window opened from click");
+        sendResponse({ success: true });
+      }).catch((error) => {
+        log(`✗ Failed to open popup: ${error.message}`);
+        sendResponse({ success: false, error: error.message });
+      });
+
+      return true; // Keep the message channel open for sendResponse
+    }
   });
-  log("Message listener registered for opening URLs");
+  log("Message listener registered for opening URLs and popups");
 })();
