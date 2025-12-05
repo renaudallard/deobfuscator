@@ -13,6 +13,9 @@
 ### 🎯 **Universal Protection Coverage**
 Supports 17+ email security services including Microsoft, Proofpoint, Mimecast, Barracuda, Cisco, and more.
 
+### ⚠️ **Automatic Detection & Warning**
+Warning button automatically appears in the message toolbar when opening emails containing obfuscated links, showing the exact count of protected URLs detected.
+
 ### 🖱️ **Simple Right-Click Interface**
 Right-click any protected link → Select "Deobfuscate Link" → See the real destination instantly.
 
@@ -92,12 +95,16 @@ Decoded URLs open in Firefox (or your default browser), not within Thunderbird.
 ### Quick Start
 
 1. **Open an email** with a protected link
-2. **Right-click** on any obfuscated URL
-3. **Select** "Deobfuscate Link" from the context menu
-4. **Review** the popup showing:
+2. **Look for the warning** — A warning button automatically appears in the message toolbar showing:
+   ```
+   ⚠️ Warning: 3 Obfuscated Links ⚠️
+   ```
+3. **Right-click** on any obfuscated URL
+4. **Select** "Deobfuscate Link" from the context menu
+5. **Review** the popup showing:
    - 📄 **Original link**: The wrapped/protected URL
    - ✅ **Clean URL**: The real destination
-5. **Choose an action**:
+6. **Choose an action**:
    - 🟢 **Open Clean Link** — Opens the decoded URL (recommended)
    - 🔴 **Open Original Link** — Opens the wrapped URL (if needed)
    - ⚪ **Cancel** — Close without action
@@ -134,7 +141,8 @@ zip -r ../deobfuscator.xpi *
 ```
 deobfuscator/
 ├── src/
-│   ├── background.js      # Core deobfuscation logic & context menu
+│   ├── background.js       # Core deobfuscation logic, context menu & auto-detection
+│   ├── message-scanner.js  # Message content scanner (unused due to protocol restrictions)
 │   ├── popup.html          # Popup UI with theme support
 │   ├── popup.js            # Popup behavior & clipboard functionality
 │   └── manifest.json       # Extension manifest (v2)
@@ -149,13 +157,22 @@ deobfuscator/
 
 ### Architecture
 
-The extension uses a **context menu approach** to work around Thunderbird's security restrictions on `owl://` and `imap://` protocols:
+The extension uses a **dual-approach system**:
 
-1. **Detection**: User right-clicks a link
+#### Automatic Detection (Background)
+1. **Message Monitoring**: Listens for `messageDisplay.onMessageDisplayed` events
+2. **Content Scanning**: Fetches and scans message body for obfuscated link patterns
+3. **Visual Warning**: Displays warning button in message toolbar with obfuscated link count
+4. **Real-time Updates**: Warning appears/disappears as you switch between messages
+
+#### Manual Deobfuscation (Context Menu)
+1. **Right-Click**: User right-clicks any link in the message
 2. **Analysis**: Background script identifies the protection service
 3. **Decoding**: Extracts the real URL using service-specific logic
 4. **Display**: Shows both URLs in a themed popup window
 5. **Action**: Opens selected URL in default browser
+
+This approach works around Thunderbird's security restrictions on `owl://` and `imap://` protocols.
 
 ### Deobfuscation Methods
 
@@ -206,6 +223,7 @@ Contributions are welcome! To add support for a new email security service:
 ### v0.0.1 (Current)
 - ✨ Initial release
 - 🛡️ Support for 17+ email security services
+- ⚠️ Automatic detection with warning indicator in message toolbar
 - 🎨 Theme-aware popup interface
 - 📋 Copy-to-clipboard functionality
 - 🌐 Opens URLs in default browser
