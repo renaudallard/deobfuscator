@@ -48,19 +48,215 @@ const log = (msg, extra) => {
     log("✗ Menus API not available");
   }
 
+  // Helper function to decode Proofpoint URL Defense v2 format
+  const decodeProofpointV2 = (encodedUrl) => {
+    try {
+      // Proofpoint v2 format uses custom character substitution
+      let decoded = encodedUrl
+        .replace(/_/g, '/')
+        .replace(/-/g, '%');
+
+      // Try to decode as URI component
+      decoded = decodeURIComponent(decoded);
+
+      // Validate it's a URL
+      if (/^https?:\/\//i.test(decoded)) {
+        return decoded;
+      }
+      return null;
+    } catch (_err) {
+      return null;
+    }
+  };
+
+  // Helper function to decode Proofpoint URL Defense v3 format
+  const decodeProofpointV3 = (encodedUrl) => {
+    try {
+      // v3 uses different encoding, try direct decode
+      const decoded = decodeURIComponent(encodedUrl);
+      if (/^https?:\/\//i.test(decoded)) {
+        return decoded;
+      }
+      return null;
+    } catch (_err) {
+      return null;
+    }
+  };
+
+  // Helper to try common URL parameter names
+  const tryCommonParams = (parsed, paramNames) => {
+    for (const param of paramNames) {
+      const value = parsed.searchParams.get(param);
+      if (value) {
+        try {
+          const decoded = decodeURIComponent(value);
+          if (/^https?:\/\//i.test(decoded)) {
+            return decoded;
+          }
+        } catch (_err) {
+          // Continue to next param
+        }
+      }
+    }
+    return null;
+  };
+
   // Helper function to deobfuscate URL
   const deobfuscateUrl = (url) => {
     try {
       const parsed = new URL(url);
-      if (!parsed.hostname || !parsed.hostname.toLowerCase().includes("safelinks.protection.outlook.com")) {
-        return null;
+      const hostname = parsed.hostname.toLowerCase();
+      const pathname = parsed.pathname;
+
+      // Microsoft Safe Links
+      if (hostname.includes("safelinks.protection.outlook.com")) {
+        const payload = parsed.searchParams.get("url") || parsed.searchParams.get("u");
+        if (payload) {
+          return decodeURIComponent(payload);
+        }
       }
-      const payload = parsed.searchParams.get("url") || parsed.searchParams.get("u");
-      if (!payload) return null;
-      return decodeURIComponent(payload);
+
+      // Proofpoint URL Defense
+      if (hostname.includes("urldefense.proofpoint.com") || hostname.includes("urldefense.com")) {
+        // Try v2 format: /v2/url?u=<encoded>
+        const v2Param = parsed.searchParams.get("u");
+        if (v2Param) {
+          const decoded = decodeProofpointV2(v2Param);
+          if (decoded) return decoded;
+        }
+
+        // Try v3 format: /v3/__<encoded>__
+        const pathMatch = pathname.match(/\/v3\/__(.+?)__/);
+        if (pathMatch && pathMatch[1]) {
+          const decoded = decodeProofpointV3(pathMatch[1]);
+          if (decoded) return decoded;
+        }
+
+        // Fallback: try 'url' parameter
+        const urlParam = parsed.searchParams.get("url");
+        if (urlParam) {
+          return decodeURIComponent(urlParam);
+        }
+      }
+
+      // Mimecast URL Protect
+      if (hostname.includes("protect") && hostname.includes("mimecast")) {
+        const result = tryCommonParams(parsed, ["url", "u"]);
+        if (result) return result;
+      }
+
+      // Barracuda Link Protection
+      if (hostname.includes("barracuda") || hostname.includes("linkprotect.cudasvc.com")) {
+        const result = tryCommonParams(parsed, ["url", "u", "a"]);
+        if (result) return result;
+      }
+
+      // Cisco Secure Email / Security Proxy
+      if (hostname.includes("cisco") || hostname.includes("iphmx.com") || hostname.includes("protected.res.cisco.com")) {
+        const result = tryCommonParams(parsed, ["url", "u"]);
+        if (result) return result;
+      }
+
+      // Check Point Harmony Email
+      if (hostname.includes("checkpoint") || hostname.includes("urlsand.net")) {
+        const result = tryCommonParams(parsed, ["url", "u", "dest"]);
+        if (result) return result;
+      }
+
+      // Egress Defend
+      if (hostname.includes("egress") || hostname.includes("egressdefend.com")) {
+        const result = tryCommonParams(parsed, ["url", "u"]);
+        if (result) return result;
+      }
+
+      // Symantec / Broadcom Messaging Gateway
+      if (hostname.includes("symantec") || hostname.includes("messagelabs") || hostname.includes("broadcom")) {
+        const result = tryCommonParams(parsed, ["url", "u", "continue"]);
+        if (result) return result;
+      }
+
+      // Sophos Email Security
+      if (hostname.includes("sophos") || hostname.includes("sandboxsafe.com")) {
+        const result = tryCommonParams(parsed, ["url", "u"]);
+        if (result) return result;
+      }
+
+      // Trend Micro
+      if (hostname.includes("trendmicro") || hostname.includes("tmurl.net")) {
+        const result = tryCommonParams(parsed, ["url", "u", "URL"]);
+        if (result) return result;
+      }
+
+      // Trustwave MailMarshal
+      if (hostname.includes("trustwave") || hostname.includes("mailmarshal")) {
+        const result = tryCommonParams(parsed, ["url", "u"]);
+        if (result) return result;
+      }
+
+      // PostOffice click-time protection
+      if (hostname.includes("postoffice") || hostname.includes("po.mx")) {
+        const result = tryCommonParams(parsed, ["url", "u"]);
+        if (result) return result;
+      }
+
+      // Intermedia
+      if (hostname.includes("intermedia") || hostname.includes("webscan.intermedia.net")) {
+        const result = tryCommonParams(parsed, ["url", "u"]);
+        if (result) return result;
+      }
+
+      // Hornetsecurity ATP
+      if (hostname.includes("hornetsecurity") || hostname.includes("atpurl.com")) {
+        const result = tryCommonParams(parsed, ["url", "u"]);
+        if (result) return result;
+      }
+
+      // OpenText / EdgePilot
+      if (hostname.includes("opentext") || hostname.includes("edgepilot") || hostname.includes("websense")) {
+        const result = tryCommonParams(parsed, ["url", "u", "dest"]);
+        if (result) return result;
+      }
+
+      // FireEye (legacy) / Trellix
+      if (hostname.includes("fireeye") || hostname.includes("trellix") || hostname.includes("mandiant")) {
+        const result = tryCommonParams(parsed, ["url", "u"]);
+        if (result) return result;
+      }
+
+      // Generic protection services - try common patterns
+      if (hostname.includes("urlprotect") || hostname.includes("linkprotect") ||
+          hostname.includes("urldefense") || hostname.includes("safeurl") ||
+          hostname.includes("securemail") || hostname.includes("maildefense")) {
+        const result = tryCommonParams(parsed, ["url", "u", "dest", "destination", "target", "link"]);
+        if (result) return result;
+      }
+
+      return null;
     } catch (_err) {
       return null;
     }
+  };
+
+  // Helper to identify the protection service
+  const identifyService = (url) => {
+    const lower = url.toLowerCase();
+    if (lower.includes("safelinks.protection.outlook.com")) return "Microsoft Safe Links";
+    if (lower.includes("urldefense.proofpoint.com") || lower.includes("urldefense.com")) return "Proofpoint URL Defense";
+    if (lower.includes("mimecast")) return "Mimecast URL Protect";
+    if (lower.includes("barracuda")) return "Barracuda Link Protection";
+    if (lower.includes("cisco") || lower.includes("iphmx")) return "Cisco Secure Email";
+    if (lower.includes("checkpoint") || lower.includes("urlsand")) return "Check Point Harmony";
+    if (lower.includes("egress")) return "Egress Defend";
+    if (lower.includes("symantec") || lower.includes("messagelabs") || lower.includes("broadcom")) return "Symantec/Broadcom";
+    if (lower.includes("sophos")) return "Sophos Email Security";
+    if (lower.includes("trendmicro") || lower.includes("tmurl")) return "Trend Micro";
+    if (lower.includes("trustwave")) return "Trustwave MailMarshal";
+    if (lower.includes("postoffice") || lower.includes("po.mx")) return "PostOffice";
+    if (lower.includes("intermedia")) return "Intermedia";
+    if (lower.includes("hornetsecurity") || lower.includes("atpurl")) return "Hornetsecurity ATP";
+    if (lower.includes("opentext") || lower.includes("edgepilot") || lower.includes("websense")) return "OpenText/EdgePilot";
+    if (lower.includes("fireeye") || lower.includes("trellix") || lower.includes("mandiant")) return "FireEye/Trellix";
+    return "Unknown Protection Service";
   };
 
   // Store pending URL for confirmation
@@ -76,6 +272,7 @@ const log = (msg, extra) => {
         const clean = deobfuscateUrl(linkUrl);
         if (clean) {
           log(`Deobfuscated: ${clean}`);
+          log(`Service detected: ${identifyService(linkUrl)}`);
 
           // Open popup window with URLs
           const popupUrl = runtime.runtime.getURL("popup.html") +
