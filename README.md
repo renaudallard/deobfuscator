@@ -78,7 +78,7 @@ Decoded URLs open in Firefox (or your default browser), not within Thunderbird.
 </tr>
 </table>
 
-### URL Shorteners (25+)
+### URL Shorteners (26+)
 
 **Popular Services**
 - ✅ bit.ly / bitly.com
@@ -96,6 +96,9 @@ Decoded URLs open in Firefox (or your default browser), not within Thunderbird.
 - ✅ Amazon (amzn.to)
 - ✅ eBay (ebay.us)
 - ✅ Rebrandly (rebrand.ly)
+
+**Privacy-Focused Services**
+- ✅ URLVanish (urlvanish.com)
 
 **Additional Shorteners**
 - ✅ adf.ly, bc.vc, clck.ru, db.tt, ity.im, q.gs, qr.ae, qr.net, smarturl.it, su.pr, trib.al, u.to, v.gd, x.co, zip.net, zpr.io, and more!
@@ -270,7 +273,11 @@ The extension uses a **multi-tier detection and resolution system**:
 1. **Detection**: Identifies shortened URL (bit.ly, tinyurl, etc.)
 2. **Privacy Warning**: Shows clear warning about what data will be exposed
 3. **User Consent**: User explicitly chooses resolution method
-4. **Direct Resolution**: Makes HTTP GET request following redirects (exposes IP, fast)
+4. **Direct Resolution**:
+   - First tries HTTP HEAD request (minimal data transfer)
+   - Falls back to GET only if needed
+   - Follows redirects automatically
+   - Parses HTML for meta refresh/JavaScript redirects as last resort
 5. **Tor Resolution** *(in development)*: Will use embedded Tor (anonymous, slower)
 6. **Display**: Shows original and resolved URLs
 7. **Action**: User decides which URL to open
@@ -287,7 +294,11 @@ This approach works around Thunderbird's security restrictions on `owl://` and `
 
 **URL Shorteners:**
 - **Detection**: Domain pattern matching (local, no network)
-- **Direct Resolution**: HTTP GET request following redirects, with fallback HTML parsing for meta refresh and JavaScript redirects
+- **Direct Resolution**:
+  - Tries HTTP HEAD request first (minimal data transfer, privacy-friendly)
+  - Falls back to GET only if HEAD doesn't work
+  - Follows HTTP redirects automatically
+  - Parses HTML for meta refresh and JavaScript redirects as last resort
 - **Tor Resolution** *(in development)*: Arti (Tor in WebAssembly) for anonymous resolution
 
 ### Security & Privacy
@@ -303,8 +314,10 @@ This approach works around Thunderbird's security restrictions on `owl://` and `
 - ⚠️ Resolution requires network request (exposes your IP)
 - ✅ Always requires explicit user consent
 - ✅ Clear privacy warnings before any request
+- ✅ Uses HTTP HEAD first (minimal data transfer)
+- ✅ Falls back to GET only when necessary
 - ✅ Follows HTTP redirects automatically
-- ✅ Parses HTML for meta refresh and JavaScript redirects
+- ✅ Parses HTML for meta refresh and JavaScript redirects (last resort)
 - ✅ No resolution history or caching
 - 🔧 In development: Embedded Tor for anonymous resolution
 
@@ -364,13 +377,14 @@ See `URL_SHORTENER_PLAN.md` and `URL_SHORTENER_EMBEDDED_TOR_PLAN.md` for detaile
 ### v0.1.0 (Current)
 - ✨ Initial release
 - 🛡️ Support for 17+ email security services
-- 🔗 URL shortener detection (25+ services)
+- 🔗 URL shortener detection (26+ services including URLVanish)
 - 🚀 Direct shortener resolution with privacy warnings
+- 🔒 Privacy-friendly HTTP HEAD requests (minimal data transfer)
 - ⚠️ Automatic detection with warning indicator in message toolbar
 - 🎨 Theme-aware popup interface with multiple views
 - 📋 Copy-to-clipboard functionality
 - 🌐 Opens URLs in default browser
-- 🔒 Privacy-first design with explicit user consent
+- 🔐 Privacy-first design with explicit user consent
 
 ### v0.2.0 (In Development)
 - 🧅 Embedded Tor support for anonymous shortener resolution (via Arti WebAssembly)

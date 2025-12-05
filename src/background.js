@@ -488,15 +488,14 @@ const log = (msg, extra) => {
   const resolveDirect = async (url, progressCallback) => {
     try {
       log(`Resolving shortener directly: ${url}`);
-      progressCallback?.({ status: 'Sending request...' });
+      progressCallback?.({ status: 'Sending HEAD request...' });
 
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 30000);
 
-      // Try with redirect: 'follow' to let browser handle redirects
-      // Then check the final URL
+      // Try HEAD request first (minimal data transfer, privacy-friendly)
       let response = await fetch(url, {
-        method: 'GET',
+        method: 'HEAD',
         redirect: 'follow',  // Let browser follow redirects
         cache: 'no-store',
         signal: controller.signal,
@@ -510,9 +509,9 @@ const log = (msg, extra) => {
       // The response.url property contains the final URL after redirects
       const finalUrl = response.url;
 
-      log(`Response status: ${response.status}`);
+      log(`HEAD response status: ${response.status}`);
       log(`Original URL: ${url}`);
-      log(`Final URL: ${finalUrl}`);
+      log(`Final URL after HEAD: ${finalUrl}`);
 
       // Check if URL changed (indicating a redirect happened)
       if (finalUrl && finalUrl !== url) {
@@ -525,9 +524,40 @@ const log = (msg, extra) => {
         };
       }
 
-      // If no redirect happened, check response status
+      // If HEAD didn't work, try GET as fallback
+      log(`HEAD didn't redirect, trying GET request`);
+      progressCallback?.({ status: 'Trying GET request...' });
+
+      const getTimeout = setTimeout(() => controller.abort(), 30000);
+      response = await fetch(url, {
+        method: 'GET',
+        redirect: 'follow',
+        cache: 'no-store',
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Thunderbird Deobfuscator)'
+        }
+      });
+      clearTimeout(getTimeout);
+
+      const finalUrlGet = response.url;
+      log(`GET response status: ${response.status}`);
+      log(`Final URL after GET: ${finalUrlGet}`);
+
+      // Check if URL changed with GET
+      if (finalUrlGet && finalUrlGet !== url) {
+        log(`✓ Resolved to: ${finalUrlGet}`);
+        progressCallback?.({ status: 'Resolution complete!' });
+        return {
+          success: true,
+          url: finalUrlGet,
+          method: 'direct'
+        };
+      }
+
+      // If still no redirect, try to parse HTML for meta refresh or JavaScript redirect
       if (response.status === 200) {
-        // Try to parse HTML for meta refresh or JavaScript redirect
+        log(`No HTTP redirect, parsing HTML for meta refresh or JS redirect`);
         const text = await response.text();
 
         // Check for meta refresh
