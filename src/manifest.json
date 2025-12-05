@@ -14,11 +14,16 @@
   },
   "permissions": [
     "menus",
+    "messagesRead",
     "<all_urls>"
   ],
   "background": {
     "scripts": [
       "background.js"
     ]
+  },
+  "message_display_action": {
+    "default_title": "No obfuscated links",
+    "default_label": ""
   }
 }

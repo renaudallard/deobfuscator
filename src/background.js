@@ -302,6 +302,103 @@ const log = (msg, extra) => {
     log("✓ Context menu handler registered");
   }
 
+  // Monitor displayed messages and scan for obfuscated links
+  if (messengerApi && messengerApi.messageDisplay) {
+    messengerApi.messageDisplay.onMessageDisplayed.addListener(async (tab, message) => {
+      log(`Message displayed in tab ${tab.id}`);
+
+      try {
+        // Get the full message content
+        const full = await messengerApi.messages.getFull(message.id);
+        log(`Got message content for message ${message.id}`);
+
+        // Scan message parts for obfuscated links
+        let obfuscatedCount = 0;
+        const scanPart = (part) => {
+          if (part.body) {
+            const bodyText = part.body;
+            // Look for obfuscated link patterns in the body
+            PROTECTION_DOMAINS.forEach(domain => {
+              const regex = new RegExp(domain.replace(/\./g, '\\.'), 'gi');
+              const matches = bodyText.match(regex);
+              if (matches) {
+                obfuscatedCount += matches.length;
+              }
+            });
+          }
+          if (part.parts) {
+            part.parts.forEach(scanPart);
+          }
+        };
+
+        scanPart(full);
+        log(`Found ${obfuscatedCount} obfuscated links in message`);
+
+        if (messengerApi.messageDisplayAction) {
+          try {
+            if (obfuscatedCount > 0) {
+              // Show warning label
+              await messengerApi.messageDisplayAction.setLabel({
+                tabId: tab.id,
+                label: `⚠️ Warning: ${obfuscatedCount} Obfuscated Link${obfuscatedCount > 1 ? 's' : ''} ⚠️`
+              });
+              await messengerApi.messageDisplayAction.setTitle({
+                tabId: tab.id,
+                title: `⚠️ ${obfuscatedCount} obfuscated link${obfuscatedCount > 1 ? 's' : ''} detected - right-click links to deobfuscate`
+              });
+              log(`✓ Set warning label for tab ${tab.id}`);
+            } else {
+              // Hide the button by setting empty label
+              await messengerApi.messageDisplayAction.setLabel({
+                tabId: tab.id,
+                label: ""
+              });
+              await messengerApi.messageDisplayAction.setTitle({
+                tabId: tab.id,
+                title: "No obfuscated links"
+              });
+              log(`✓ Hidden warning label for tab ${tab.id} (no obfuscated links)`);
+            }
+          } catch (err) {
+            log(`✗ Failed to set message display action: ${err.message}`);
+          }
+        }
+      } catch (err) {
+        log(`Error scanning message: ${err.message}`);
+      }
+    });
+    log("✓ Message display listener registered");
+  } else {
+    log("messageDisplay API not available");
+  }
+
+  // Define protection domains for scanning
+  const PROTECTION_DOMAINS = [
+    'safelinks.protection.outlook.com',
+    'urldefense.proofpoint.com',
+    'urldefense.com',
+    'mimecast',
+    'barracuda',
+    'linkprotect.cudasvc.com',
+    'cisco',
+    'iphmx.com',
+    'checkpoint',
+    'urlsand.net',
+    'egress',
+    'symantec',
+    'messagelabs',
+    'sophos',
+    'trendmicro',
+    'tmurl.net',
+    'trustwave',
+    'postoffice',
+    'intermedia',
+    'hornetsecurity',
+    'opentext',
+    'fireeye',
+    'trellix'
+  ];
+
   // Listen for messages from message display scripts
   runtime.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "openUrl" && message.url) {
