@@ -112,7 +112,9 @@ const log = (msg, extra) => {
     'adf.ly', 'bc.vc', 'budurl.com', 'clck.ru', 'db.tt',
     'filoops.info', 'linkbun.ch', 'ity.im', 'q.gs', 'qr.ae',
     'qr.net', 'rebrand.ly', 'smarturl.it', 'su.pr', 'trib.al',
-    'u.to', 'v.gd', 'x.co', 'zip.net', 'zpr.io'
+    'u.to', 'v.gd', 'x.co', 'zip.net', 'zpr.io',
+    // Privacy-focused / expiring link services
+    'urlvanish.com'
   ];
 
   // Check if URL is a shortener
@@ -387,13 +389,21 @@ const log = (msg, extra) => {
         const full = await messengerApi.messages.getFull(message.id);
         log(`Got message content for message ${message.id}`);
 
-        // Scan message parts for obfuscated links
+        // Scan message parts for obfuscated links (protection services + shorteners)
         let obfuscatedCount = 0;
         const scanPart = (part) => {
           if (part.body) {
             const bodyText = part.body;
-            // Look for obfuscated link patterns in the body
+            // Look for protection service patterns
             PROTECTION_DOMAINS.forEach(domain => {
+              const regex = new RegExp(domain.replace(/\./g, '\\.'), 'gi');
+              const matches = bodyText.match(regex);
+              if (matches) {
+                obfuscatedCount += matches.length;
+              }
+            });
+            // Look for shortener patterns
+            SHORTENER_DOMAINS.forEach(domain => {
               const regex = new RegExp(domain.replace(/\./g, '\\.'), 'gi');
               const matches = bodyText.match(regex);
               if (matches) {
@@ -478,14 +488,16 @@ const log = (msg, extra) => {
   const resolveDirect = async (url, progressCallback) => {
     try {
       log(`Resolving shortener directly: ${url}`);
-      progressCallback?.({ status: 'Sending HEAD request...' });
+      progressCallback?.({ status: 'Sending request...' });
 
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 30000);
 
-      const response = await fetch(url, {
-        method: 'HEAD',
-        redirect: 'manual',
+      // Try with redirect: 'follow' to let browser handle redirects
+      // Then check the final URL
+      let response = await fetch(url, {
+        method: 'GET',
+        redirect: 'follow',  // Let browser follow redirects
         cache: 'no-store',
         signal: controller.signal,
         headers: {
@@ -495,19 +507,59 @@ const log = (msg, extra) => {
 
       clearTimeout(timeout);
 
-      const location = response.headers.get('Location');
-      if (location) {
-        const resolvedUrl = new URL(location, url).href;
-        log(`✓ Resolved to: ${resolvedUrl}`);
+      // The response.url property contains the final URL after redirects
+      const finalUrl = response.url;
+
+      log(`Response status: ${response.status}`);
+      log(`Original URL: ${url}`);
+      log(`Final URL: ${finalUrl}`);
+
+      // Check if URL changed (indicating a redirect happened)
+      if (finalUrl && finalUrl !== url) {
+        log(`✓ Resolved to: ${finalUrl}`);
         progressCallback?.({ status: 'Resolution complete!' });
         return {
           success: true,
-          url: resolvedUrl,
+          url: finalUrl,
           method: 'direct'
         };
       }
 
-      throw new Error('No redirect found - URL may not be a shortener');
+      // If no redirect happened, check response status
+      if (response.status === 200) {
+        // Try to parse HTML for meta refresh or JavaScript redirect
+        const text = await response.text();
+
+        // Check for meta refresh
+        const metaRefreshMatch = text.match(/<meta[^>]*http-equiv=["']refresh["'][^>]*content=["'][^;]*;\s*url=([^"']+)["']/i);
+        if (metaRefreshMatch && metaRefreshMatch[1]) {
+          const metaUrl = new URL(metaRefreshMatch[1], url).href;
+          log(`✓ Found meta refresh: ${metaUrl}`);
+          progressCallback?.({ status: 'Resolution complete!' });
+          return {
+            success: true,
+            url: metaUrl,
+            method: 'direct'
+          };
+        }
+
+        // Check for window.location redirect
+        const jsRedirectMatch = text.match(/window\.location(?:\s*=\s*|\.href\s*=\s*|\.replace\s*\(\s*)["']([^"']+)["']/i);
+        if (jsRedirectMatch && jsRedirectMatch[1]) {
+          const jsUrl = new URL(jsRedirectMatch[1], url).href;
+          log(`✓ Found JavaScript redirect: ${jsUrl}`);
+          progressCallback?.({ status: 'Resolution complete!' });
+          return {
+            success: true,
+            url: jsUrl,
+            method: 'direct'
+          };
+        }
+
+        throw new Error('Shortener requires JavaScript or interactive elements to resolve. Try opening in browser.');
+      }
+
+      throw new Error(`Unexpected response status: ${response.status}`);
     } catch (err) {
       log(`✗ Resolution failed: ${err.message}`);
       if (err.name === 'AbortError') {
