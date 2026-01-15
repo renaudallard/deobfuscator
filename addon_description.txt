@@ -9,14 +9,14 @@ Supports 17+ email security services including Microsoft, Proofpoint, Mimecast, 
 
 ### URL Shortener Support with Privacy Controls
 Detects and resolves shortened URLs (bit.ly, tinyurl.com, t.co, etc.) with clear privacy warnings.
-- **Direct Resolution** (fast, <1s) - Available now
-- **Tor Resolution** (private, in development) - Anonymous via embedded Tor
+- Direct Resolution (fast, <1s) - Available now
+- Tor Resolution (private, in development) - Anonymous via embedded Tor
 
 ### Automatic Detection & Warning
 Warning button automatically appears in the message toolbar when opening emails containing obfuscated links, showing the exact count of protected URLs detected.
 
 ### Simple Right-Click Interface
-Right-click any protected or shortened link → Select "Deobfuscate Link" → See the real destination or choose resolution method.
+Right-click any protected or shortened link -> Select "Deobfuscate Link" -> See the real destination or choose resolution method.
 
 ### Beautiful Theme-Aware Popup
 - Clean, modern interface that respects your system theme (light/dark mode)
@@ -92,80 +92,80 @@ Decoded URLs open in Firefox (or your default browser), not within Thunderbird.
 
 ### For Email Security Links (Instant Deobfuscation)
 
-1. **Open an email** with a protected link
-2. **Look for the warning** — A warning button automatically appears in the message toolbar showing: `⚠️ Warning: 3 Obfuscated Links ⚠️`
-3. **Right-click** on any obfuscated URL
-4. **Select** "Deobfuscate Link" from the context menu
-5. **Review** the popup showing:
-   - **Original link**: The wrapped/protected URL
-   - **Clean URL**: The real destination
-6. **Choose an action**:
-   - **Open Clean Link** — Opens the decoded URL (recommended)
-   - **Open Original Link** — Opens the wrapped URL (if needed)
-   - **Cancel** — Close without action
-   - **Copy** — One-click copy either URL to clipboard
+1. Open an email with a protected link
+2. Look for the warning -- A warning button automatically appears in the message toolbar showing: Warning: 3 Obfuscated Links
+3. Right-click on any obfuscated URL
+4. Select "Deobfuscate Link" from the context menu
+5. Review the popup showing:
+   - Original link: The wrapped/protected URL
+   - Clean URL: The real destination
+6. Choose an action:
+   - Open Clean Link -- Opens the decoded URL (recommended)
+   - Open Original Link -- Opens the wrapped URL (if needed)
+   - Cancel -- Close without action
+   - Copy -- One-click copy either URL to clipboard
 
 **Example:**
 
-**Before:** `https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fexample.com`
+**Before:** https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fexample.com
 
-**After:** `https://example.com`
+**After:** https://example.com
 
 ### For URL Shorteners (Privacy-Aware Resolution)
 
-1. **Open an email** with a shortened link (bit.ly, tinyurl.com, etc.)
-2. **Right-click** on the shortened URL
-3. **Select** "Deobfuscate Link" from the context menu
-4. **Review the warning** — Extension detects shortener and shows:
-   ```
-   ⚠️ URL Shortener Detected
+1. Open an email with a shortened link (bit.ly, tinyurl.com, etc.)
+2. Right-click on the shortened URL
+3. Select "Deobfuscate Link" from the context menu
+4. Review the warning -- Extension detects shortener and shows:
+   
+   URL Shortener Detected
    Service: bit.ly (URL shortener)
-   ⚠️ Destination Unknown
-   ```
-5. **Choose resolution method**:
+   Destination Unknown
+   
+5. Choose resolution method:
 
-   **Direct Resolution (Fast)**
+   Direct Resolution (Fast)
    - Exposes to shortener: Your IP address, timestamp, that you checked this link
    - Speed: Usually <1 second
-   - Click: **"Resolve Directly"**
+   - Click: "Resolve Directly"
 
-   **Tor Resolution (Private)** — *In development*
+   Tor Resolution (Private) -- *In development*
    - Will hide your real IP (uses Tor exit node)
    - Anonymous resolution via embedded Tor
    - Expected speed: 3-10 seconds
    - Status: Not yet available
 
-6. **After resolution**, see the final destination:
-   - **Shortened link**: bit.ly/abc123
-   - **Final destination**: https://example.com/real/page
+6. After resolution, see the final destination:
+   - Shortened link: bit.ly/abc123
+   - Final destination: https://example.com/real/page
 
-7. **Choose an action**:
-   - **Open Destination** — Opens the resolved URL (recommended)
-   - **Open Shortened Link** — Opens the shortener URL
-   - **Cancel** — Close without action
+7. Choose an action:
+   - Open Destination -- Opens the resolved URL (recommended)
+   - Open Shortened Link -- Opens the shortener URL
+   - Cancel -- Close without action
 
 **Example:**
 
-**Before:** `https://bit.ly/3xY2zQ`
+**Before:** https://bit.ly/3xY2zQ
 
-**Privacy Warning → User Confirms → Resolution**
+**Privacy Warning -> User Confirms -> Resolution**
 
-**After:** `https://example.com/real/destination/page`
+**After:** https://example.com/real/destination/page
 
 ---
 
 ## Privacy Guarantees
 
 **Email Security Links:**
-- ✅ 100% local processing
-- ✅ No network requests
-- ✅ Instant results
+- 100% local processing
+- No network requests
+- Instant results
 
 **URL Shorteners:**
-- ✅ Detection is local (no network)
-- ⚠️ **Third-Party Querying:** Resolution involves the add-on querying the shortener service directly. This is functionally equivalent to clicking the original link, but the action is triggered by the add-on *without* the user clicking the link in the email body.
-- ⚠️ Resolution requires network request (exposes your IP)
-- ✅ Always asks permission first
-- ✅ Clear warnings about privacy trade-offs
-- ✅ User chooses between speed and privacy
-- 🚫 Never resolves automatically
+- Detection is local (no network)
+- **Third-Party Querying:** Resolution involves the add-on querying the shortener service directly. This is functionally equivalent to clicking the original link, but the action is triggered by the add-on *without* the user clicking the link in the email body.
+- Resolution requires network request (exposes your IP)
+- Always asks permission first
+- Clear warnings about privacy trade-offs
+- User chooses between speed and privacy
+- Never resolves automatically
