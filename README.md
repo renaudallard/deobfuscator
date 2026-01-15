@@ -309,15 +309,12 @@ This approach works around Thunderbird's security restrictions on `owl://` and `
 
 **URL Shorteners:**
 - ✅ Detection is local (no network)
+- ⚠️ **Third-Party Querying:** Resolution involves the add-on querying the shortener service directly. This is functionally equivalent to clicking the original link, but the action is triggered by the add-on *without* the user clicking the link in the email body.
 - ⚠️ Resolution requires network request (exposes your IP)
-- ✅ Always requires explicit user consent
-- ✅ Clear privacy warnings before any request
-- ✅ Uses HTTP HEAD first (minimal data transfer)
-- ✅ Falls back to GET only when necessary
-- ✅ Follows HTTP redirects automatically
-- ✅ Parses HTML for meta refresh and JavaScript redirects (last resort)
-- ✅ No resolution history or caching
-- 🔧 In development: Embedded Tor for anonymous resolution
+- ✅ Always asks permission first
+- ✅ Clear warnings about privacy trade-offs
+- ✅ User chooses between speed and privacy
+- 🚫 Never resolves automatically
 
 **General:**
 - ✅ Minimal permissions required
