@@ -1,0 +1,171 @@
+# Thunderbird Deobfuscator
+
+A powerful Thunderbird extension that reveals the real destination of obfuscated email security links and shortened URLs with privacy-preserving resolution options.
+
+## Features
+
+### Universal Protection Coverage
+Supports 17+ email security services including Microsoft, Proofpoint, Mimecast, Barracuda, Cisco, and more.
+
+### URL Shortener Support with Privacy Controls
+Detects and resolves shortened URLs (bit.ly, tinyurl.com, t.co, etc.) with clear privacy warnings.
+- **Direct Resolution** (fast, <1s) - Available now
+- **Tor Resolution** (private, in development) - Anonymous via embedded Tor
+
+### Automatic Detection & Warning
+Warning button automatically appears in the message toolbar when opening emails containing obfuscated links, showing the exact count of protected URLs detected.
+
+### Simple Right-Click Interface
+Right-click any protected or shortened link → Select "Deobfuscate Link" → See the real destination or choose resolution method.
+
+### Beautiful Theme-Aware Popup
+- Clean, modern interface that respects your system theme (light/dark mode)
+- Shows both original and decoded URLs side-by-side
+- One-click copy buttons for easy URL sharing
+- Clear privacy warnings before any network requests
+
+### Privacy-First Design
+- All protection service processing happens locally in Thunderbird
+- No automatic URL resolution - always requires user consent
+- Clear privacy warnings explain what information is exposed
+- No external servers or tracking for protection services
+- Original emails remain completely unchanged
+
+### Opens in Your Browser
+Decoded URLs open in Firefox (or your default browser), not within Thunderbird.
+
+---
+
+## Supported Services
+
+### Email Security Services (17+)
+
+**Enterprise Solutions**
+- Microsoft Safe Links
+- Proofpoint URL Defense (v2 & v3)
+- Mimecast URL Protect
+- Barracuda Link Protection
+- Cisco Secure Email
+- Check Point Harmony Email
+- Symantec/Broadcom Messaging Gateway
+- Trend Micro Email Security
+- FireEye/Trellix
+
+**Additional Services**
+- Sophos Email Security
+- Trustwave MailMarshal
+- Egress Defend
+- Hornetsecurity ATP
+- OpenText/EdgePilot
+- Intermedia
+- PostOffice
+- Generic URL protection services
+
+### URL Shorteners (26+)
+
+**Popular Services**
+- bit.ly / bitly.com
+- TinyURL (tinyurl.com)
+- Twitter (t.co)
+- Google (goo.gl)
+- Ow.ly
+- is.gd
+- Buff.ly
+
+**Social Media & Enterprise**
+- LinkedIn (lnkd.in)
+- YouTube (youtu.be)
+- Facebook (fb.me)
+- Amazon (amzn.to)
+- eBay (ebay.us)
+- Rebrandly (rebrand.ly)
+
+**Privacy-Focused Services**
+- URLVanish (urlvanish.com)
+
+**Additional Shorteners**
+- adf.ly, bc.vc, clck.ru, db.tt, ity.im, q.gs, qr.ae, qr.net, smarturl.it, su.pr, trib.al, u.to, v.gd, x.co, zip.net, zpr.io, and more!
+
+---
+
+## Usage
+
+### For Email Security Links (Instant Deobfuscation)
+
+1. **Open an email** with a protected link
+2. **Look for the warning** — A warning button automatically appears in the message toolbar showing: `⚠️ Warning: 3 Obfuscated Links ⚠️`
+3. **Right-click** on any obfuscated URL
+4. **Select** "Deobfuscate Link" from the context menu
+5. **Review** the popup showing:
+   - **Original link**: The wrapped/protected URL
+   - **Clean URL**: The real destination
+6. **Choose an action**:
+   - **Open Clean Link** — Opens the decoded URL (recommended)
+   - **Open Original Link** — Opens the wrapped URL (if needed)
+   - **Cancel** — Close without action
+   - **Copy** — One-click copy either URL to clipboard
+
+**Example:**
+
+**Before:** `https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fexample.com`
+
+**After:** `https://example.com`
+
+### For URL Shorteners (Privacy-Aware Resolution)
+
+1. **Open an email** with a shortened link (bit.ly, tinyurl.com, etc.)
+2. **Right-click** on the shortened URL
+3. **Select** "Deobfuscate Link" from the context menu
+4. **Review the warning** — Extension detects shortener and shows:
+   ```
+   ⚠️ URL Shortener Detected
+   Service: bit.ly (URL shortener)
+   ⚠️ Destination Unknown
+   ```
+5. **Choose resolution method**:
+
+   **Direct Resolution (Fast)**
+   - Exposes to shortener: Your IP address, timestamp, that you checked this link
+   - Speed: Usually <1 second
+   - Click: **"Resolve Directly"**
+
+   **Tor Resolution (Private)** — *In development*
+   - Will hide your real IP (uses Tor exit node)
+   - Anonymous resolution via embedded Tor
+   - Expected speed: 3-10 seconds
+   - Status: Not yet available
+
+6. **After resolution**, see the final destination:
+   - **Shortened link**: bit.ly/abc123
+   - **Final destination**: https://example.com/real/page
+
+7. **Choose an action**:
+   - **Open Destination** — Opens the resolved URL (recommended)
+   - **Open Shortened Link** — Opens the shortener URL
+   - **Cancel** — Close without action
+
+**Example:**
+
+**Before:** `https://bit.ly/3xY2zQ`
+
+**Privacy Warning → User Confirms → Resolution**
+
+**After:** `https://example.com/real/destination/page`
+
+---
+
+## Privacy Guarantees
+
+**Email Security Links:**
+- ✅ 100% local processing
+- ✅ No network requests
+- ✅ Instant results
+
+**URL Shorteners:**
+- ✅ Detection is local (no network)
+- ⚠️ **Third-Party Querying:** Resolution involves the add-on querying the shortener service directly. This is functionally equivalent to clicking the original link, but the action is triggered by the add-on *without* the user clicking the link in the email body.
+- ⚠️ Resolution requires network request (exposes your IP)
+- ✅ Always asks permission first
+- ✅ Clear warnings about privacy trade-offs
+- ✅ User chooses between speed and privacy
+- 🚫 Never resolves automatically
