@@ -331,8 +331,12 @@ This approach works around Thunderbird's security restrictions on `owl://` and `
 ### Popup Window (Light Mode)
 Clean, modern interface showing original and decoded URLs with action buttons.
 
+![Popup Window Light Mode](deobfuscator_screenshot.png)
+
 ### Popup Window (Dark Mode)
 Automatically adapts to your system theme for comfortable viewing.
+
+![Popup Window Dark Mode](deobfuscator_screenshot2.png)
 
 ---
 
