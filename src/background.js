@@ -338,8 +338,8 @@ const log = (msg, extra) => {
               await runtime.windows.create({
                 url: popupUrl,
                 type: "popup",
-                width: 650,
-                height: 400
+                width: 800,
+                height: 600
               });
               log("✓ Popup window opened");
             } catch (error) {
@@ -363,8 +363,8 @@ const log = (msg, extra) => {
               await runtime.windows.create({
                 url: popupUrl,
                 type: "popup",
-                width: 650,
-                height: 500
+                width: 800,
+                height: 600
               });
               log("✓ Popup window opened for shortener");
             } catch (error) {
@@ -656,8 +656,8 @@ const log = (msg, extra) => {
       runtime.windows.create({
         url: popupUrl,
         type: "popup",
-        width: 650,
-        height: 350
+        width: 800,
+        height: 600
       }).then(() => {
         log("✓ Popup window opened from click");
         sendResponse({ success: true });
