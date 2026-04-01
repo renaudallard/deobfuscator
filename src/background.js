@@ -351,9 +351,6 @@ const log = (msg, extra) => {
     return "Unknown Protection Service";
   };
 
-  // Store pending URL for confirmation
-  let pendingUrl = null;
-
   // Handle context menu clicks
   if (menusApi && menusApi.onClicked) {
     menusApi.onClicked.addListener(async (info, tab) => {
@@ -660,27 +657,6 @@ const log = (msg, extra) => {
       return true; // Keep the message channel open for sendResponse
     }
 
-    if (message.action === "showPopup") {
-      log(`Received request to show popup for link`);
-      const popupUrl = runtime.runtime.getURL("popup.html") +
-        "?original=" + encodeURIComponent(message.original) +
-        "&clean=" + encodeURIComponent(message.clean);
-
-      runtime.windows.create({
-        url: popupUrl,
-        type: "popup",
-        width: 800,
-        height: 600
-      }).then(() => {
-        log("✓ Popup window opened from click");
-        sendResponse({ success: true });
-      }).catch((error) => {
-        log(`✗ Failed to open popup: ${error.message}`);
-        sendResponse({ success: false, error: error.message });
-      });
-
-      return true; // Keep the message channel open for sendResponse
-    }
   });
-  log("Message listener registered for opening URLs and popups");
+  log("Message listener registered for opening URLs");
 })();
