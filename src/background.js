@@ -570,8 +570,9 @@ const log = (msg, extra) => {
         log(`No HTTP redirect, parsing HTML for meta refresh or JS redirect`);
         const text = await response.text();
 
-        // Check for meta refresh
-        const metaRefreshMatch = text.match(/<meta[^>]*http-equiv=["']refresh["'][^>]*content=["'][^;]*;\s*url=([^"']+)["']/i);
+        // Check for meta refresh (handles both attribute orderings)
+        const metaRefreshMatch = text.match(/<meta[^>]*http-equiv=["']refresh["'][^>]*content=["'][^;]*;\s*url=([^"']+)["']/i)
+          || text.match(/<meta[^>]*content=["'][^;]*;\s*url=([^"']+)["'][^>]*http-equiv=["']refresh["']/i);
         if (metaRefreshMatch && metaRefreshMatch[1]) {
           const metaUrl = new URL(metaRefreshMatch[1], url).href;
           log(`✓ Found meta refresh: ${metaUrl}`);
