@@ -288,6 +288,47 @@ const log = (msg, extra) => {
     }
   };
 
+  // Multi-layer deobfuscation: iteratively unwrap nested protection services
+  const deobfuscateUrlFull = (url) => {
+    const layers = [];
+    let current = url;
+    const MAX_DEPTH = 10;
+
+    for (let i = 0; i < MAX_DEPTH; i++) {
+      const result = deobfuscateUrl(current);
+
+      if (result === null) {
+        break;
+      }
+
+      if (typeof result === 'string') {
+        layers.push(identifyService(current));
+
+        if (result === current) {
+          break;
+        }
+        current = result;
+      } else if (result.type === 'shortener') {
+        return {
+          type: 'shortener',
+          service: result.service,
+          url: current,
+          layers: layers
+        };
+      }
+    }
+
+    if (layers.length > 0) {
+      return {
+        type: 'protection',
+        cleanUrl: current,
+        layers: layers
+      };
+    }
+
+    return null;
+  };
+
   // Helper to identify the protection service
   const identifyService = (url) => {
     const lower = url.toLowerCase();
@@ -320,19 +361,17 @@ const log = (msg, extra) => {
         const linkUrl = info.linkUrl;
         log(`Context menu clicked on: ${linkUrl}`);
 
-        const result = deobfuscateUrl(linkUrl);
+        const result = deobfuscateUrlFull(linkUrl);
         if (result) {
-          if (typeof result === 'string') {
-            // Old behavior: clean URL returned directly (protection service)
-            log(`Deobfuscated: ${result}`);
-            log(`Service detected: ${identifyService(linkUrl)}`);
+          if (result.type === 'protection') {
+            log(`Deobfuscated: ${result.cleanUrl} (${result.layers.length} layer(s))`);
 
-            // Open popup window with URLs
             const popupUrl = runtime.runtime.getURL("popup.html") +
               "?type=protection" +
               "&original=" + encodeURIComponent(linkUrl) +
-              "&clean=" + encodeURIComponent(result) +
-              "&service=" + encodeURIComponent(identifyService(linkUrl));
+              "&clean=" + encodeURIComponent(result.cleanUrl) +
+              "&service=" + encodeURIComponent(result.layers.join(" \u2192 ")) +
+              "&layers=" + result.layers.length;
 
             try {
               await runtime.windows.create({
@@ -345,19 +384,24 @@ const log = (msg, extra) => {
             } catch (error) {
               log(`✗ Failed to open popup: ${error.message}, opening directly`);
               if (runtime.windows && runtime.windows.openDefaultBrowser) {
-                runtime.windows.openDefaultBrowser(result);
+                runtime.windows.openDefaultBrowser(result.cleanUrl);
                 log(`✓ Opened clean URL in browser`);
               }
             }
           } else if (result.type === 'shortener') {
-            // New behavior: shortener detected, needs resolution
             log(`Shortener detected: ${result.service}`);
+            if (result.layers.length > 0) {
+              log(`Unwrapped ${result.layers.length} protection layer(s): ${result.layers.join(" \u2192 ")}`);
+            }
 
-            // Open popup window for shortener resolution
             const popupUrl = runtime.runtime.getURL("popup.html") +
               "?type=shortener" +
-              "&original=" + encodeURIComponent(linkUrl) +
-              "&service=" + encodeURIComponent(result.service);
+              "&original=" + encodeURIComponent(result.url) +
+              "&service=" + encodeURIComponent(result.service) +
+              (result.layers.length > 0
+                ? "&layers=" + result.layers.length +
+                  "&services=" + encodeURIComponent(result.layers.join(" \u2192 "))
+                : "");
 
             try {
               await runtime.windows.create({

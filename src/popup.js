@@ -6,6 +6,8 @@ const type = params.get('type');
 const original = params.get('original');
 const clean = params.get('clean');
 const service = params.get('service');
+const layers = params.get('layers') ? parseInt(params.get('layers'), 10) : 0;
+const services = params.get('services');
 
 // State management
 let currentView = null;
@@ -68,8 +70,12 @@ if (type === 'protection') {
 function initProtectionView() {
   showView('protection-view');
 
-  // Set service name
+  // Set service name and layer info
   document.getElementById('protection-service').textContent = service;
+  if (layers > 1) {
+    document.getElementById('protection-service-label').textContent =
+      layers + ' layers of URL rewriting removed:';
+  }
 
   // Display URLs
   document.getElementById('original-url-protection').textContent = original;
@@ -106,6 +112,14 @@ function initShortenerView() {
 
   // Set service name
   document.getElementById('shortener-service').textContent = service;
+
+  // Show protection layers info if shortener was wrapped
+  if (layers > 0 && services) {
+    const layersInfo = document.getElementById('shortener-layers-info');
+    layersInfo.textContent = layers + ' protection layer' +
+      (layers > 1 ? 's' : '') + ' removed: ' + services;
+    layersInfo.classList.remove('hidden');
+  }
 
   // Display URL
   document.getElementById('original-url-shortener').textContent = original;

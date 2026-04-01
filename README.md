@@ -13,6 +13,9 @@
 ### 🎯 **Universal Protection Coverage**
 Supports 17+ email security services including Microsoft, Proofpoint, Mimecast, Barracuda, Cisco, and more.
 
+### 🔄 **Multi-Layer URL Rewriting Support**
+Automatically peels off multiple layers of URL rewriting when attackers chain several protection services together (e.g., Safe Links wrapping Proofpoint wrapping the real URL). The popup shows the full chain of services that were removed.
+
 ### 🔗 **URL Shortener Support with Privacy Controls**
 Detects and resolves shortened URLs (bit.ly, tinyurl.com, t.co, etc.) with clear privacy warnings.
 - **🚀 Direct Resolution** (fast, <1s) - Available now
@@ -151,6 +154,12 @@ Decoded URLs open in Firefox (or your default browser), not within Thunderbird.
 
 **After:** `https://example.com`
 
+**Multi-layer example:**
+
+**Before:** `https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Furldefense.proofpoint.com%2Fv2%2Furl%3Fu%3Dhttps-3A__example.com`
+
+**After:** `https://example.com` (2 layers removed: Microsoft Safe Links, Proofpoint URL Defense)
+
 ---
 
 ### For URL Shorteners (Privacy-Aware Resolution)
@@ -263,8 +272,8 @@ The extension uses a **multi-tier detection and resolution system**:
 #### Tier 2a: Email Security Service Deobfuscation (Local)
 1. **Right-Click**: User right-clicks any link in the message
 2. **Analysis**: Background script identifies the protection service or shortener
-3. **Instant Decoding**: Extracts real URL using service-specific logic (local only)
-4. **Display**: Shows both URLs in themed popup window
+3. **Multi-Layer Unwrapping**: Iteratively peels off nested protection layers (up to 10 deep) until the real URL or a shortener is reached
+4. **Display**: Shows both URLs in themed popup window, with the full chain of services removed
 5. **Action**: Opens selected URL in default browser
 
 #### Tier 2b: URL Shortener Resolution (Privacy-Aware)
@@ -289,6 +298,7 @@ This approach works around Thunderbird's security restrictions on `owl://` and `
 - **Proofpoint v2**: Custom character substitution decode
 - **Proofpoint v3**: Path-based extraction
 - **Generic Services**: Tries common parameter names (`url`, `u`, `dest`, `target`, etc.)
+- **Multi-Layer**: Iterative unwrapping of nested protection services (up to 10 layers deep), with full service chain displayed in the popup
 
 **URL Shorteners:**
 - **Detection**: Domain pattern matching (local, no network)
@@ -379,9 +389,9 @@ Contributions are welcome!
 - 🔐 Privacy-first design with explicit user consent
 
 ### v0.2.0 (In Development)
+- 🔄 Multi-layer URL rewriting support: iteratively unwraps nested protection services
 - 🧅 Embedded Tor support for anonymous shortener resolution (via Arti WebAssembly)
 - ⚙️ User preferences and settings page
-- 🔄 Redirect chain detection for nested shorteners
 - 📊 Bulk shortener resolution for multiple links in one email
 - 🎯 Improved resolution success rate
 
