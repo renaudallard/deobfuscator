@@ -140,6 +140,39 @@ const log = (msg, extra) => {
     }
   };
 
+  // Shared service definitions for param-based protection services.
+  // Services with custom decoding (Safe Links, Proofpoint) are handled
+  // separately in deobfuscateUrl but use the same hostname patterns.
+  const PROTECTION_SERVICES = [
+    { name: "Mimecast URL Protect", hostnamesAll: ["protect", "mimecast"], params: ["url", "u"] },
+    { name: "Barracuda Link Protection", hostnames: ["barracuda", "linkprotect.cudasvc.com"], params: ["url", "u", "a"] },
+    { name: "Cisco Secure Email", hostnames: ["cisco", "iphmx.com", "protected.res.cisco.com"], params: ["url", "u"] },
+    { name: "Check Point Harmony", hostnames: ["checkpoint", "urlsand.net"], params: ["url", "u", "dest"] },
+    { name: "Egress Defend", hostnames: ["egress", "egressdefend.com"], params: ["url", "u"] },
+    { name: "Symantec/Broadcom", hostnames: ["symantec", "messagelabs", "broadcom"], params: ["url", "u", "continue"] },
+    { name: "Sophos Email Security", hostnames: ["sophos", "sandboxsafe.com"], params: ["url", "u"] },
+    { name: "Trend Micro", hostnames: ["trendmicro", "tmurl.net"], params: ["url", "u", "URL"] },
+    { name: "Trustwave MailMarshal", hostnames: ["trustwave", "mailmarshal"], params: ["url", "u"] },
+    { name: "PostOffice", hostnames: ["postoffice", "po.mx"], params: ["url", "u"] },
+    { name: "Intermedia", hostnames: ["intermedia", "webscan.intermedia.net"], params: ["url", "u"] },
+    { name: "Hornetsecurity ATP", hostnames: ["hornetsecurity", "atpurl.com"], params: ["url", "u"] },
+    { name: "OpenText/EdgePilot", hostnames: ["opentext", "edgepilot", "websense"], params: ["url", "u", "dest"] },
+    { name: "FireEye/Trellix", hostnames: ["fireeye", "trellix", "mandiant"], params: ["url", "u"] },
+    { name: "Unknown Protection Service", hostnames: ["urlprotect", "linkprotect", "urldefense", "safeurl", "securemail", "maildefense"], params: ["url", "u", "dest", "destination", "target", "link"] },
+  ];
+
+  // Match hostname against shared service definitions
+  const matchService = (hostname) => {
+    for (const svc of PROTECTION_SERVICES) {
+      if (svc.hostnamesAll) {
+        if (svc.hostnamesAll.every(d => hostname.includes(d))) return svc;
+      } else if (svc.hostnames.some(d => hostname.includes(d))) {
+        return svc;
+      }
+    }
+    return null;
+  };
+
   // Helper function to deobfuscate URL
   const deobfuscateUrl = (url) => {
     try {
@@ -147,7 +180,7 @@ const log = (msg, extra) => {
       const hostname = parsed.hostname.toLowerCase();
       const pathname = parsed.pathname;
 
-      // Microsoft Safe Links
+      // Microsoft Safe Links (custom decoding)
       if (hostname.includes("safelinks.protection.outlook.com")) {
         const payload = parsed.searchParams.get("url") || parsed.searchParams.get("u");
         if (payload) {
@@ -155,118 +188,30 @@ const log = (msg, extra) => {
         }
       }
 
-      // Proofpoint URL Defense
+      // Proofpoint URL Defense (custom decoding)
       if (hostname.includes("urldefense.proofpoint.com") || hostname.includes("urldefense.com")) {
-        // Try v2 format: /v2/url?u=<encoded>
         const v2Param = parsed.searchParams.get("u");
         if (v2Param) {
           const decoded = decodeProofpointV2(v2Param);
           if (decoded) return decoded;
         }
 
-        // Try v3 format: /v3/__<encoded>__
         const pathMatch = pathname.match(/\/v3\/__(.+?)__/);
         if (pathMatch && pathMatch[1]) {
           const decoded = decodeProofpointV3(pathMatch[1]);
           if (decoded) return decoded;
         }
 
-        // Fallback: try 'url' parameter
         const urlParam = parsed.searchParams.get("url");
         if (urlParam) {
           return decodeURIComponent(urlParam);
         }
       }
 
-      // Mimecast URL Protect
-      if (hostname.includes("protect") && hostname.includes("mimecast")) {
-        const result = tryCommonParams(parsed, ["url", "u"]);
-        if (result) return result;
-      }
-
-      // Barracuda Link Protection
-      if (hostname.includes("barracuda") || hostname.includes("linkprotect.cudasvc.com")) {
-        const result = tryCommonParams(parsed, ["url", "u", "a"]);
-        if (result) return result;
-      }
-
-      // Cisco Secure Email / Security Proxy
-      if (hostname.includes("cisco") || hostname.includes("iphmx.com") || hostname.includes("protected.res.cisco.com")) {
-        const result = tryCommonParams(parsed, ["url", "u"]);
-        if (result) return result;
-      }
-
-      // Check Point Harmony Email
-      if (hostname.includes("checkpoint") || hostname.includes("urlsand.net")) {
-        const result = tryCommonParams(parsed, ["url", "u", "dest"]);
-        if (result) return result;
-      }
-
-      // Egress Defend
-      if (hostname.includes("egress") || hostname.includes("egressdefend.com")) {
-        const result = tryCommonParams(parsed, ["url", "u"]);
-        if (result) return result;
-      }
-
-      // Symantec / Broadcom Messaging Gateway
-      if (hostname.includes("symantec") || hostname.includes("messagelabs") || hostname.includes("broadcom")) {
-        const result = tryCommonParams(parsed, ["url", "u", "continue"]);
-        if (result) return result;
-      }
-
-      // Sophos Email Security
-      if (hostname.includes("sophos") || hostname.includes("sandboxsafe.com")) {
-        const result = tryCommonParams(parsed, ["url", "u"]);
-        if (result) return result;
-      }
-
-      // Trend Micro
-      if (hostname.includes("trendmicro") || hostname.includes("tmurl.net")) {
-        const result = tryCommonParams(parsed, ["url", "u", "URL"]);
-        if (result) return result;
-      }
-
-      // Trustwave MailMarshal
-      if (hostname.includes("trustwave") || hostname.includes("mailmarshal")) {
-        const result = tryCommonParams(parsed, ["url", "u"]);
-        if (result) return result;
-      }
-
-      // PostOffice click-time protection
-      if (hostname.includes("postoffice") || hostname.includes("po.mx")) {
-        const result = tryCommonParams(parsed, ["url", "u"]);
-        if (result) return result;
-      }
-
-      // Intermedia
-      if (hostname.includes("intermedia") || hostname.includes("webscan.intermedia.net")) {
-        const result = tryCommonParams(parsed, ["url", "u"]);
-        if (result) return result;
-      }
-
-      // Hornetsecurity ATP
-      if (hostname.includes("hornetsecurity") || hostname.includes("atpurl.com")) {
-        const result = tryCommonParams(parsed, ["url", "u"]);
-        if (result) return result;
-      }
-
-      // OpenText / EdgePilot
-      if (hostname.includes("opentext") || hostname.includes("edgepilot") || hostname.includes("websense")) {
-        const result = tryCommonParams(parsed, ["url", "u", "dest"]);
-        if (result) return result;
-      }
-
-      // FireEye (legacy) / Trellix
-      if (hostname.includes("fireeye") || hostname.includes("trellix") || hostname.includes("mandiant")) {
-        const result = tryCommonParams(parsed, ["url", "u"]);
-        if (result) return result;
-      }
-
-      // Generic protection services - try common patterns
-      if (hostname.includes("urlprotect") || hostname.includes("linkprotect") ||
-          hostname.includes("urldefense") || hostname.includes("safeurl") ||
-          hostname.includes("securemail") || hostname.includes("maildefense")) {
-        const result = tryCommonParams(parsed, ["url", "u", "dest", "destination", "target", "link"]);
+      // Standard param-based protection services
+      const svc = matchService(hostname);
+      if (svc) {
+        const result = tryCommonParams(parsed, svc.params);
         if (result) return result;
       }
 
@@ -325,27 +270,14 @@ const log = (msg, extra) => {
     return null;
   };
 
-  // Helper to identify the protection service
+  // Helper to identify the protection service (uses shared PROTECTION_SERVICES table)
   const identifyService = (url) => {
     try {
       const h = new URL(url).hostname.toLowerCase();
       if (h.includes("safelinks.protection.outlook.com")) return "Microsoft Safe Links";
       if (h.includes("urldefense.proofpoint.com") || h.includes("urldefense.com")) return "Proofpoint URL Defense";
-      if (h.includes("mimecast")) return "Mimecast URL Protect";
-      if (h.includes("barracuda") || h.includes("cudasvc.com")) return "Barracuda Link Protection";
-      if (h.includes("cisco") || h.includes("iphmx")) return "Cisco Secure Email";
-      if (h.includes("checkpoint") || h.includes("urlsand")) return "Check Point Harmony";
-      if (h.includes("egress")) return "Egress Defend";
-      if (h.includes("symantec") || h.includes("messagelabs") || h.includes("broadcom")) return "Symantec/Broadcom";
-      if (h.includes("sophos") || h.includes("sandboxsafe.com")) return "Sophos Email Security";
-      if (h.includes("trendmicro") || h.includes("tmurl")) return "Trend Micro";
-      if (h.includes("trustwave") || h.includes("mailmarshal")) return "Trustwave MailMarshal";
-      if (h.includes("postoffice") || h.includes("po.mx")) return "PostOffice";
-      if (h.includes("intermedia")) return "Intermedia";
-      if (h.includes("hornetsecurity") || h.includes("atpurl")) return "Hornetsecurity ATP";
-      if (h.includes("opentext") || h.includes("edgepilot") || h.includes("websense")) return "OpenText/EdgePilot";
-      if (h.includes("fireeye") || h.includes("trellix") || h.includes("mandiant")) return "FireEye/Trellix";
-      return "Unknown Protection Service";
+      const svc = matchService(h);
+      return svc ? svc.name : "Unknown Protection Service";
     } catch (_err) {
       return "Unknown Protection Service";
     }
