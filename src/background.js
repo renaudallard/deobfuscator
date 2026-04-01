@@ -27,10 +27,6 @@ const log = (msg, extra) => {
     return;
   }
 
-  // Network-level auto-redirect is disabled to allow the click interceptor
-  // to show a confirmation dialog instead.
-  log("Auto-redirect disabled; using click interceptor for user confirmation");
-
   // Create context menu for links
   const menusApi = runtime.menus || runtime.contextMenus;
   if (menusApi) {
