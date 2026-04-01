@@ -434,26 +434,31 @@ const log = (msg, extra) => {
         log(`Got message content for message ${message.id}`);
 
         // Scan message parts for obfuscated links (protection services + shorteners)
+        const seenUrls = new Set();
         let obfuscatedCount = 0;
         const scanPart = (part) => {
           if (part.body) {
-            const bodyText = part.body;
-            // Look for protection service patterns
-            PROTECTION_DOMAINS.forEach(domain => {
-              const regex = new RegExp(domain.replace(/\./g, '\\.'), 'gi');
-              const matches = bodyText.match(regex);
-              if (matches) {
-                obfuscatedCount += matches.length;
+            const urlRegex = /https?:\/\/[^\s"'<>]+/gi;
+            const matches = part.body.match(urlRegex) || [];
+            for (const rawUrl of matches) {
+              // Normalize HTML entities and trim trailing punctuation
+              const url = rawUrl.replace(/&amp;/g, '&').replace(/[.,;:!?)]+$/, '');
+              if (seenUrls.has(url)) continue;
+              seenUrls.add(url);
+
+              try {
+                const hostname = new URL(url).hostname.toLowerCase();
+                const isProtection = PROTECTION_DOMAINS.some(d => hostname.includes(d));
+                const isShortened = SHORTENER_DOMAINS.some(d =>
+                  hostname === d || hostname.endsWith('.' + d)
+                );
+                if (isProtection || isShortened) {
+                  obfuscatedCount++;
+                }
+              } catch (_err) {
+                // Skip invalid URLs
               }
-            });
-            // Look for shortener patterns
-            SHORTENER_DOMAINS.forEach(domain => {
-              const regex = new RegExp(domain.replace(/\./g, '\\.'), 'gi');
-              const matches = bodyText.match(regex);
-              if (matches) {
-                obfuscatedCount += matches.length;
-              }
-            });
+            }
           }
           if (part.parts) {
             part.parts.forEach(scanPart);
