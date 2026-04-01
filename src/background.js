@@ -630,6 +630,14 @@ const log = (msg, extra) => {
             throw new Error('Unknown resolution method: ' + method);
           }
 
+          // If resolved URL is itself a protection service URL, unwrap it
+          const unwrapped = deobfuscateUrlFull(result.url);
+          if (unwrapped && unwrapped.type === 'protection') {
+            log(`Resolved shortener led to protection URL, unwrapped ${unwrapped.layers.length} layer(s)`);
+            result.url = unwrapped.cleanUrl;
+            result.unwrappedLayers = unwrapped.layers;
+          }
+
           sendResponse({ success: true, result });
         } catch (err) {
           sendResponse({ success: false, error: err.message });
