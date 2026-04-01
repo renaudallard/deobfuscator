@@ -510,7 +510,7 @@ const log = (msg, extra) => {
         cache: 'no-store',
         signal: controller.signal,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Thunderbird Deobfuscator)'
+          'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0'
         }
       });
 
@@ -545,7 +545,7 @@ const log = (msg, extra) => {
         cache: 'no-store',
         signal: controller.signal,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Thunderbird Deobfuscator)'
+          'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0'
         }
       });
       clearTimeout(getTimeout);
