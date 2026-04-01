@@ -331,24 +331,28 @@ const log = (msg, extra) => {
 
   // Helper to identify the protection service
   const identifyService = (url) => {
-    const lower = url.toLowerCase();
-    if (lower.includes("safelinks.protection.outlook.com")) return "Microsoft Safe Links";
-    if (lower.includes("urldefense.proofpoint.com") || lower.includes("urldefense.com")) return "Proofpoint URL Defense";
-    if (lower.includes("mimecast")) return "Mimecast URL Protect";
-    if (lower.includes("barracuda")) return "Barracuda Link Protection";
-    if (lower.includes("cisco") || lower.includes("iphmx")) return "Cisco Secure Email";
-    if (lower.includes("checkpoint") || lower.includes("urlsand")) return "Check Point Harmony";
-    if (lower.includes("egress")) return "Egress Defend";
-    if (lower.includes("symantec") || lower.includes("messagelabs") || lower.includes("broadcom")) return "Symantec/Broadcom";
-    if (lower.includes("sophos")) return "Sophos Email Security";
-    if (lower.includes("trendmicro") || lower.includes("tmurl")) return "Trend Micro";
-    if (lower.includes("trustwave")) return "Trustwave MailMarshal";
-    if (lower.includes("postoffice") || lower.includes("po.mx")) return "PostOffice";
-    if (lower.includes("intermedia")) return "Intermedia";
-    if (lower.includes("hornetsecurity") || lower.includes("atpurl")) return "Hornetsecurity ATP";
-    if (lower.includes("opentext") || lower.includes("edgepilot") || lower.includes("websense")) return "OpenText/EdgePilot";
-    if (lower.includes("fireeye") || lower.includes("trellix") || lower.includes("mandiant")) return "FireEye/Trellix";
-    return "Unknown Protection Service";
+    try {
+      const h = new URL(url).hostname.toLowerCase();
+      if (h.includes("safelinks.protection.outlook.com")) return "Microsoft Safe Links";
+      if (h.includes("urldefense.proofpoint.com") || h.includes("urldefense.com")) return "Proofpoint URL Defense";
+      if (h.includes("mimecast")) return "Mimecast URL Protect";
+      if (h.includes("barracuda") || h.includes("cudasvc.com")) return "Barracuda Link Protection";
+      if (h.includes("cisco") || h.includes("iphmx")) return "Cisco Secure Email";
+      if (h.includes("checkpoint") || h.includes("urlsand")) return "Check Point Harmony";
+      if (h.includes("egress")) return "Egress Defend";
+      if (h.includes("symantec") || h.includes("messagelabs") || h.includes("broadcom")) return "Symantec/Broadcom";
+      if (h.includes("sophos") || h.includes("sandboxsafe.com")) return "Sophos Email Security";
+      if (h.includes("trendmicro") || h.includes("tmurl")) return "Trend Micro";
+      if (h.includes("trustwave") || h.includes("mailmarshal")) return "Trustwave MailMarshal";
+      if (h.includes("postoffice") || h.includes("po.mx")) return "PostOffice";
+      if (h.includes("intermedia")) return "Intermedia";
+      if (h.includes("hornetsecurity") || h.includes("atpurl")) return "Hornetsecurity ATP";
+      if (h.includes("opentext") || h.includes("edgepilot") || h.includes("websense")) return "OpenText/EdgePilot";
+      if (h.includes("fireeye") || h.includes("trellix") || h.includes("mandiant")) return "FireEye/Trellix";
+      return "Unknown Protection Service";
+    } catch (_err) {
+      return "Unknown Protection Service";
+    }
   };
 
   // Handle context menu clicks
