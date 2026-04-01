@@ -14,13 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Check if version changed
         id: version
         run: |
           NEW=$(jq -r .version src/manifest.json)
-          OLD=$(git show HEAD~1:src/manifest.json | jq -r .version)
+          OLD=$(git show ${{ github.event.before }}:src/manifest.json | jq -r .version)
           if [ "$NEW" != "$OLD" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "version=$NEW" >> "$GITHUB_OUTPUT"
