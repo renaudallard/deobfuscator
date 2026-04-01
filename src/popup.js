@@ -125,24 +125,24 @@ function initShortenerView() {
   document.getElementById('original-url-shortener').textContent = original;
 
   // Copy button
-  document.getElementById('copy-original-shortener').addEventListener('click', (e) => {
+  document.getElementById('copy-original-shortener').onclick = (e) => {
     e.preventDefault();
     copyToClipboard(original, e.target);
-  });
+  };
 
   // Action buttons
-  document.getElementById('cancel-shortener').addEventListener('click', () => {
+  document.getElementById('cancel-shortener').onclick = () => {
     window.close();
-  });
+  };
 
-  document.getElementById('open-anyway').addEventListener('click', () => {
+  document.getElementById('open-anyway').onclick = () => {
     openUrl(original);
-  });
+  };
 
   // Resolve directly button
-  document.getElementById('resolve-direct').addEventListener('click', () => {
+  document.getElementById('resolve-direct').onclick = () => {
     resolveShortener('direct');
-  });
+  };
 }
 
 // Resolve shortener with given method
@@ -154,15 +154,15 @@ async function resolveShortener(method) {
   document.getElementById('original-url-resolving').textContent = original;
 
   // Copy button for resolving view
-  document.getElementById('copy-original-resolving').addEventListener('click', (e) => {
+  document.getElementById('copy-original-resolving').onclick = (e) => {
     e.preventDefault();
     copyToClipboard(original, e.target);
-  });
+  };
 
   // Cancel button
-  document.getElementById('cancel-resolving').addEventListener('click', () => {
+  document.getElementById('cancel-resolving').onclick = () => {
     window.close();
-  });
+  };
 
   // Listen for progress updates
   const progressListener = (message) => {
@@ -212,28 +212,28 @@ function showResolvedView() {
   document.getElementById('clean-url-resolved').textContent = resolvedUrl;
 
   // Copy buttons
-  document.getElementById('copy-original-resolved').addEventListener('click', (e) => {
+  document.getElementById('copy-original-resolved').onclick = (e) => {
     e.preventDefault();
     copyToClipboard(original, e.target);
-  });
+  };
 
-  document.getElementById('copy-clean-resolved').addEventListener('click', (e) => {
+  document.getElementById('copy-clean-resolved').onclick = (e) => {
     e.preventDefault();
     copyToClipboard(resolvedUrl, e.target);
-  });
+  };
 
   // Action buttons
-  document.getElementById('cancel-resolved').addEventListener('click', () => {
+  document.getElementById('cancel-resolved').onclick = () => {
     window.close();
-  });
+  };
 
-  document.getElementById('open-original-resolved').addEventListener('click', () => {
+  document.getElementById('open-original-resolved').onclick = () => {
     openUrl(original);
-  });
+  };
 
-  document.getElementById('open-clean-resolved').addEventListener('click', () => {
+  document.getElementById('open-clean-resolved').onclick = () => {
     openUrl(resolvedUrl);
-  });
+  };
 }
 
 // Show error view
@@ -245,22 +245,22 @@ function showErrorView(errorMessage) {
   document.getElementById('error-message').textContent = errorMessage;
 
   // Copy button
-  document.getElementById('copy-original-error').addEventListener('click', (e) => {
+  document.getElementById('copy-original-error').onclick = (e) => {
     e.preventDefault();
     copyToClipboard(original, e.target);
-  });
+  };
 
   // Action buttons
-  document.getElementById('cancel-error').addEventListener('click', () => {
+  document.getElementById('cancel-error').onclick = () => {
     window.close();
-  });
+  };
 
-  document.getElementById('retry-error').addEventListener('click', () => {
+  document.getElementById('retry-error').onclick = () => {
     // Go back to shortener view and retry
     initShortenerView();
-  });
+  };
 
-  document.getElementById('open-anyway-error').addEventListener('click', () => {
+  document.getElementById('open-anyway-error').onclick = () => {
     openUrl(original);
-  });
+  };
 }
