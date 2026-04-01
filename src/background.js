@@ -446,17 +446,8 @@ const log = (msg, extra) => {
               if (seenUrls.has(url)) continue;
               seenUrls.add(url);
 
-              try {
-                const hostname = new URL(url).hostname.toLowerCase();
-                const isProtection = PROTECTION_DOMAINS.some(d => hostname.includes(d));
-                const isShortened = SHORTENER_DOMAINS.some(d =>
-                  hostname === d || hostname.endsWith('.' + d)
-                );
-                if (isProtection || isShortened) {
-                  obfuscatedCount++;
-                }
-              } catch (_err) {
-                // Skip invalid URLs
+              if (deobfuscateUrlFull(url)) {
+                obfuscatedCount++;
               }
             }
           }
@@ -505,33 +496,6 @@ const log = (msg, extra) => {
   } else {
     log("messageDisplay API not available");
   }
-
-  // Define protection domains for scanning
-  const PROTECTION_DOMAINS = [
-    'safelinks.protection.outlook.com',
-    'urldefense.proofpoint.com',
-    'urldefense.com',
-    'mimecast',
-    'barracuda',
-    'linkprotect.cudasvc.com',
-    'cisco',
-    'iphmx.com',
-    'checkpoint',
-    'urlsand.net',
-    'egress',
-    'symantec',
-    'messagelabs',
-    'sophos',
-    'trendmicro',
-    'tmurl.net',
-    'trustwave',
-    'postoffice',
-    'intermedia',
-    'hornetsecurity',
-    'opentext',
-    'fireeye',
-    'trellix'
-  ];
 
   // Direct resolution function
   const resolveDirect = async (url, progressCallback) => {
