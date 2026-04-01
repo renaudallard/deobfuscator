@@ -2,7 +2,7 @@
 
 > A powerful Thunderbird extension that reveals the real destination of obfuscated email security links and shortened URLs with privacy-preserving resolution options.
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/yourusername/deobfuscator)
+[![Version](https://img.shields.io/github/v/release/renaudallard/deobfuscator)](https://github.com/renaudallard/deobfuscator/releases/latest)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Thunderbird](https://img.shields.io/badge/thunderbird-102%2B-orange.svg)](https://www.thunderbird.net)
 

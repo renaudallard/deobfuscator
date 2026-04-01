@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/manifest.json'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if version changed
+        id: version
+        run: |
+          NEW=$(jq -r .version src/manifest.json)
+          OLD=$(git show HEAD~1:src/manifest.json | jq -r .version)
+          if [ "$NEW" != "$OLD" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "version=$NEW" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build XPI
+        if: steps.version.outputs.changed == 'true'
+        run: |
+          cd src
+          zip -r ../deobfuscator.xpi * -x "*.git*" -x "*node_modules*" -x "*.DS_Store"
+
+      - name: Create release
+        if: steps.version.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          gh release create "v${VERSION}" \
+            --title "v${VERSION}" \
+            --generate-notes \
+            deobfuscator.xpi
