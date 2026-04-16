@@ -11,7 +11,7 @@
 ## ✨ Features
 
 ### 🎯 **Universal Protection Coverage**
-Supports 17+ email security services including Microsoft, Proofpoint, Mimecast, Barracuda, Cisco, and more.
+Supports 18+ email security services including Microsoft, Proofpoint, Mimecast, Barracuda, Cisco, AWS SES, and more.
 
 ### 🔄 **Multi-Layer URL Rewriting Support**
 Automatically peels off multiple layers of URL rewriting when attackers chain several protection services together (e.g., Safe Links wrapping Proofpoint wrapping the real URL). The popup shows the full chain of services that were removed.
@@ -47,7 +47,7 @@ Decoded URLs open in Firefox (or your default browser), not within Thunderbird.
 
 ## 🛡️ Supported Services
 
-### Email Security Services (17+)
+### Email Security Services (18+)
 
 <table>
 <tr>
@@ -63,6 +63,7 @@ Decoded URLs open in Firefox (or your default browser), not within Thunderbird.
 - ✅ Symantec/Broadcom Messaging Gateway
 - ✅ Trend Micro Email Security
 - ✅ FireEye/Trellix
+- ✅ AWS SES Click Tracking (awstrack.me)
 
 </td>
 <td width="50%">

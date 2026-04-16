@@ -5,7 +5,7 @@ A powerful Thunderbird extension that reveals the real destination of obfuscated
 ## Features
 
 ### Universal Protection Coverage
-Supports 17+ email security services including Microsoft, Proofpoint, Mimecast, Barracuda, Cisco, and more.
+Supports 18+ email security services including Microsoft, Proofpoint, Mimecast, Barracuda, Cisco, AWS SES, and more.
 
 ### URL Shortener Support with Privacy Controls
 Detects and resolves shortened URLs (bit.ly, tinyurl.com, t.co, etc.) with clear privacy warnings.
@@ -38,7 +38,7 @@ Decoded URLs open in Firefox (or your default browser), not within Thunderbird.
 
 ## Supported Services
 
-### Email Security Services (17+)
+### Email Security Services (18+)
 
 **Enterprise Solutions**
 - Microsoft Safe Links
@@ -50,6 +50,7 @@ Decoded URLs open in Firefox (or your default browser), not within Thunderbird.
 - Symantec/Broadcom Messaging Gateway
 - Trend Micro Email Security
 - FireEye/Trellix
+- AWS SES Click Tracking (awstrack.me)
 
 **Additional Services**
 - Sophos Email Security

@@ -188,6 +188,20 @@ const log = (msg, extra) => {
         }
       }
 
+      // AWS SES click tracking: destination URL is single-encoded in the path
+      // after /L0/, followed by /<index>/<tracking-id>. Decode locally.
+      if (hostname.endsWith("awstrack.me")) {
+        const match = pathname.match(/^\/L0\/([^/]+)/);
+        if (match && match[1]) {
+          try {
+            const decoded = decodeURIComponent(match[1]);
+            if (/^https?:\/\//i.test(decoded)) return decoded;
+          } catch (_err) {
+            // Fall through to other handlers
+          }
+        }
+      }
+
       // Proofpoint URL Defense (custom decoding)
       if (hostname.includes("urldefense.proofpoint.com") || hostname.includes("urldefense.com")) {
         const v2Param = parsed.searchParams.get("u");
@@ -275,6 +289,7 @@ const log = (msg, extra) => {
     try {
       const h = new URL(url).hostname.toLowerCase();
       if (h.includes("safelinks.protection.outlook.com")) return "Microsoft Safe Links";
+      if (h.endsWith("awstrack.me")) return "AWS SES Click Tracking";
       if (h.includes("urldefense.proofpoint.com") || h.includes("urldefense.com")) return "Proofpoint URL Defense";
       const svc = matchService(h);
       return svc ? svc.name : "Unknown Protection Service";
