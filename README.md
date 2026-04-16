@@ -82,7 +82,7 @@ Decoded URLs open in Firefox (or your default browser), not within Thunderbird.
 </tr>
 </table>
 
-### URL Shorteners (26+)
+### URL Shorteners (27+)
 
 **Popular Services**
 - ✅ bit.ly / bitly.com
@@ -103,6 +103,9 @@ Decoded URLs open in Firefox (or your default browser), not within Thunderbird.
 
 **Privacy-Focused Services**
 - ✅ URLVanish (urlvanish.com)
+
+**Email Click Trackers**
+- ✅ Action Network (click.actionnetwork.org)
 
 **Additional Shorteners**
 - ✅ adf.ly, bc.vc, clck.ru, db.tt, ity.im, q.gs, qr.ae, qr.net, smarturl.it, su.pr, trib.al, u.to, v.gd, x.co, zip.net, zpr.io, and more!

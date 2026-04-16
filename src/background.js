@@ -110,7 +110,9 @@ const log = (msg, extra) => {
     'qr.net', 'rebrand.ly', 'smarturl.it', 'su.pr', 'trib.al',
     'u.to', 'v.gd', 'x.co', 'zip.net', 'zpr.io',
     // Privacy-focused / expiring link services
-    'urlvanish.com'
+    'urlvanish.com',
+    // Email click trackers with server-side destination lookup
+    'click.actionnetwork.org'
   ];
 
   // Check if URL is a shortener
