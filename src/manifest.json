@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Deobfuscator",
   "description": "Restores original URLs from Microsoft Safe Links and similar wrappers in displayed messages, including nested/base64 encoded content and attached .eml files.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "developer": {
     "name": "Renaud Allard"
   },
